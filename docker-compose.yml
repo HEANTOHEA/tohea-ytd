@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  yt-music-downloader:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: yt-music-downloader:latest
+    container_name: yt-music-downloader
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - HOST=0.0.0.0
+      - NODE_ENV=production
+      # Uncomment and fill if YouTube requires cookies on datacenter IPs:
+      # - YT_COOKIES_CONTENT=your_cookies_txt_content_here
+      # - PROXY_URL=http://user:pass@proxy.host:port

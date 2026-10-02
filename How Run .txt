@@ -1,0 +1,61 @@
+YouTube Music Downloader — How to run
+=====================================
+
+1. Install Node.js (https://nodejs.org) if you do not have it.
+
+2. Install yt-dlp and ffmpeg:
+
+   Windows (using winget):
+     winget install yt-dlp
+     winget install ffmpeg
+
+   Windows (using pip):
+     pip install yt-dlp
+
+   macOS (using Homebrew):
+     brew install yt-dlp ffmpeg
+
+   Linux:
+     sudo apt install ffmpeg
+     pip install yt-dlp
+
+3. Open a terminal in this folder and run:
+
+   npm install
+   npm start
+
+4. Open in your browser:
+
+   http://localhost:3000
+
+5. Paste a YouTube or YouTube Music URL and click Download.
+
+
+Supported URL formats
+---------------------
+- Single video:    https://www.youtube.com/watch?v=VIDEO_ID
+- YouTube Music:   https://music.youtube.com/watch?v=VIDEO_ID
+- Short link:      https://youtu.be/VIDEO_ID
+- Playlist:        https://www.youtube.com/playlist?list=PLAYLIST_ID
+- YT Music album:  https://music.youtube.com/playlist?list=OLAK5uy_...
+
+
+Requirements
+------------
+- Node.js 18+
+- yt-dlp (https://github.com/yt-dlp/yt-dlp)
+- ffmpeg (https://ffmpeg.org) — needed for MP3 conversion
+
+Both yt-dlp and ffmpeg must be available in your system PATH.
+
+
+Tips
+----
+- The server auto-detects yt-dlp and ffmpeg on startup.
+- If yt-dlp is missing, the health badge will show a warning.
+- MP3 quality can be selected from the dropdown (320, 256, 192, 128, 64 Kbps).
+- Playlist ZIP downloads process tracks sequentially — large playlists may take time.
+
+Change port:
+   Windows PowerShell:  $env:PORT=3001; npm start
+   Linux/macOS:         PORT=3001 npm start

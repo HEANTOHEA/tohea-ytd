@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>YouTube Music Downloader — Download Songs & Playlists as MP3</title>
+  <meta name="description" content="Download YouTube Music songs, videos and playlists as MP3 or M4A. Paste a link, pick quality, and save tracks or ZIP archives.">
+  <meta name="theme-color" content="#0f0f0f">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Navigation Header -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="#" class="brand-logo">
+        <div class="logo-icon">
+          <i class="fa-brands fa-youtube"></i>
+        </div>
+        <span class="brand-name">YTMusic<span class="highlight">Mp3</span></span>
+      </a>
+      
+      <nav class="nav-links">
+        <a href="#how-it-works"><i class="fa-solid fa-circle-info"></i> How It Works</a>
+        <a href="#features"><i class="fa-solid fa-star"></i> Features</a>
+        <a href="#faq"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero-section" id="main">
+    <div class="hero-bg-glow"></div>
+    <div class="container hero-container">
+      <div class="hero-badge">
+        <span class="badge-pulse"></span>
+        <i class="fa-brands fa-youtube"></i> YouTube Music Downloader MP3
+      </div>
+
+      <h1 class="hero-title">Download YouTube Music <span class="gradient-text">Songs to MP3</span></h1>
+      <p class="hero-subtitle">Paste a song, video or playlist link from YouTube / YouTube Music. Download individual tracks or grab the whole playlist in one ZIP — high quality MP3, no app install.</p>
+      <p id="download-mode-badge" class="download-mode-badge mode-preview">Checking server...</p>
+
+      <!-- Search & Download Card -->
+      <div class="search-card-wrapper">
+        <form id="main-form" class="search-card" onsubmit="return false;">
+          <div class="input-row">
+            <div class="input-icon">
+              <i class="fa-brands fa-youtube"></i>
+            </div>
+            <input type="text" 
+                   inputmode="url"
+                   id="id_url" 
+                   class="url-input" 
+                   placeholder="Paste YouTube or YouTube Music song or playlist link..." 
+                   required 
+                   autocomplete="off"
+                   aria-label="YouTube or YouTube Music link">
+            
+            <div class="action-buttons">
+              <button type="button" id="btn-paste" class="icon-btn" title="Paste from Clipboard" aria-label="Paste link">
+                <i class="fa-regular fa-clipboard"></i>
+                <span class="tooltip">Paste</span>
+              </button>
+              <button type="button" id="btn-clear" class="icon-btn hidden" title="Clear input" aria-label="Clear link">
+                <i class="fa-solid fa-xmark"></i>
+              </button>
+            </div>
+
+            <button type="submit" id="btn-download" class="btn-submit">
+              <span class="btn-text">Download</span>
+              <i class="fa-solid fa-arrow-right btn-arrow"></i>
+              <span class="spinner hidden" id="spinner"></span>
+            </button>
+          </div>
+
+          <div class="converter-options">
+            <label class="option-label" for="quality-select">
+              <i class="fa-solid fa-sliders"></i> Output quality
+              <select id="quality-select" class="quality-select" aria-label="Audio bitrate">
+                <option value="320" selected>320 Kbps MP3</option>
+                <option value="256">256 Kbps MP3</option>
+                <option value="192">192 Kbps</option>
+                <option value="128">128 Kbps</option>
+                <option value="64">64 Kbps</option>
+              </select>
+            </label>
+
+            <!-- Quick Demo Button -->
+            <div class="demo-triggers">
+              <span>Test Examples:</span>
+              <button type="button" class="demo-btn" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Demo Video</button>
+              <button type="button" class="demo-btn" data-url="https://music.youtube.com/watch?v=dQw4w9WgXcQ">Demo YT Music</button>
+            </div>
+          </div>
+        </form>
+
+        <div class="notice-bar">
+          <i class="fa-solid fa-shield-halved"></i> 100% Free, Safe & Cloud-based. No Software or Extensions Required!
+        </div>
+      </div>
+
+      <!-- Results Container (Dynamically Populated) -->
+      <div id="results-container" class="results-container hidden">
+        <!-- Result Cards Rendered Here via JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works Section -->
+  <section class="section how-it-works-section" id="how-it-works">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Quick Guide</span>
+        <h2 class="section-title">How to download YouTube Music to MP3</h2>
+        <p class="section-desc">Copy a link, paste it above, and save tracks in seconds — works on phone and desktop browsers.</p>
+      </div>
+
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <div class="step-icon text-red">
+            <i class="fa-solid fa-link"></i>
+          </div>
+          <h3>Copy Music Link</h3>
+          <p>Open YouTube or YouTube Music app / website. Click <strong>Share</strong> on any song, video or playlist and click <strong>Copy Link</strong>.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <div class="step-icon text-purple">
+            <i class="fa-solid fa-paste"></i>
+          </div>
+          <h3>Paste the URL</h3>
+          <p>Paste the copied link into the field at the top of this page and click <strong>Download</strong>.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <div class="step-icon text-cyan">
+            <i class="fa-solid fa-arrows-rotate"></i>
+          </div>
+          <h3>Pick quality</h3>
+          <p>Choose your preferred bitrate (320 Kbps MP3 recommended) from the dropdown under the input.</p>
+        </div>
+
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <div class="step-icon text-green">
+            <i class="fa-solid fa-circle-down"></i>
+          </div>
+          <h3>Save MP3 or ZIP</h3>
+          <p>Click <strong>Download MP3</strong> on each track, or use <strong>ZIP Download</strong> for entire playlists.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section features-section" id="features">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Why Choose Us</span>
+        <h2 class="section-title">Key Features of YouTube Music Downloader</h2>
+        <p class="section-desc">Fast online converter — batch ZIP, artwork download, and multiple quality options.</p>
+      </div>
+
+      <div class="features-grid">
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-bolt-lightning"></i></div>
+          <h3>Instant downloads</h3>
+          <p>Paste a link and get downloadable files in seconds — no desktop software or browser extension.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-sliders"></i></div>
+          <h3>Quality options</h3>
+          <p>Select 320, 256, 192, 128, or 64 Kbps depending on your storage and listening needs.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-file-zipper"></i></div>
+          <h3>Playlist ZIP</h3>
+          <p>Download every track from a playlist in one ZIP file with a single click.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-compact-disc"></i></div>
+          <h3>Video & Audio</h3>
+          <p>Works with both YouTube videos and YouTube Music tracks — converts to MP3 automatically.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
+          <h3>No App Installation</h3>
+          <p>Fully online web tool. Works in Chrome, Safari, Firefox, Edge, iOS Safari, and Android Chrome.</p>
+        </div>
+
+        <div class="feature-box">
+          <div class="feature-icon"><i class="fa-solid fa-user-shield"></i></div>
+          <h3>100% Free & Secure</h3>
+          <p>No registration required. Clean interface with strict user privacy protections.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Supported Platforms -->
+  <section class="section platforms-section">
+    <div class="container">
+      <h3 class="platforms-heading">Compatible across all major devices & platforms</h3>
+      <div class="platforms-grid">
+        <div class="platform-card">
+          <i class="fa-brands fa-windows"></i>
+          <span>Windows</span>
+        </div>
+        <div class="platform-card">
+          <i class="fa-brands fa-apple"></i>
+          <span>macOS & iOS</span>
+        </div>
+        <div class="platform-card">
+          <i class="fa-brands fa-android"></i>
+          <span>Android</span>
+        </div>
+        <div class="platform-card">
+          <i class="fa-brands fa-linux"></i>
+          <span>Linux</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Accordion Section -->
+  <section class="section faq-section" id="faq">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-tag">Help Center</span>
+        <h2 class="section-title">Frequently Asked Questions</h2>
+        <p class="section-desc">Got questions about downloading YouTube Music? Here are common answers.</p>
+      </div>
+
+      <div class="accordion" id="faq-accordion">
+        <div class="accordion-item active">
+          <button class="accordion-header">
+            <span>How does the YouTube Music downloader work?</span>
+            <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </button>
+          <div class="accordion-content">
+            <p>Paste any YouTube or YouTube Music URL. The server uses <strong>yt-dlp</strong> to extract audio and convert it to high-quality MP3. Make sure yt-dlp and ffmpeg are installed on your server — see <code>How Run .txt</code> for setup.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <span>Where are the downloaded music files saved on my device?</span>
+            <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </button>
+          <div class="accordion-content">
+            <p>By default, files are saved to your browser's default <strong>Downloads</strong> folder (e.g. Downloads on Mac/Windows or Files app on iOS/Android).</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <span>Can I download full playlists in a ZIP file?</span>
+            <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </button>
+          <div class="accordion-content">
+            <p>Yes! After you paste a playlist link, use the purple <strong>ZIP Download</strong> bar to save all tracks into one archive.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <span>What formats and quality levels are supported?</span>
+            <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </button>
+          <div class="accordion-content">
+            <p>We support MP3 at 320, 256, 192, 128, and 64 Kbps. The audio is extracted from the best available YouTube source and transcoded using ffmpeg.</p>
+          </div>
+        </div>
+
+        <div class="accordion-item">
+          <button class="accordion-header">
+            <span>Is it safe to use YTMusicMp3 downloader?</span>
+            <i class="fa-solid fa-chevron-down accordion-icon"></i>
+          </button>
+          <div class="accordion-content">
+            <p>Absolutely. The site is 100% cloud-based, free of malware or popups, and requires no desktop client or mobile APK installation.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-brand">
+        <div class="brand-logo">
+          <div class="logo-icon"><i class="fa-brands fa-youtube"></i></div>
+          <span class="brand-name">YTMusic<span class="highlight">Mp3</span></span>
+        </div>
+        <p class="footer-disclaimer">
+          Use only for music you have rights to download. © 2026 YTMusicMp3 — not affiliated with YouTube or Google LLC.
+        </p>
+      </div>
+
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">DMCA Disclaimer</a>
+        <a href="#">Contact Support</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- Custom JS -->
+  <script src="app.js"></script>
+</body>
+</html>
