@@ -34,6 +34,9 @@
         <a href="#how-it-works"><i class="fa-solid fa-circle-info"></i> How It Works</a>
         <a href="#features"><i class="fa-solid fa-star"></i> Features</a>
         <a href="#faq"><i class="fa-solid fa-circle-question"></i> FAQ</a>
+        <button type="button" class="btn-cookies-nav" id="btn-open-cookies">
+          <i class="fa-solid fa-cookie-bite"></i> <span id="cookies-status-text">YouTube Cookies</span>
+        </button>
       </nav>
     </div>
   </header>
@@ -324,6 +327,36 @@
       </div>
     </div>
   </footer>
+
+  <!-- Cookies Modal -->
+  <div class="modal-overlay hidden" id="cookies-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-cookie-bite"></i> YouTube Cloud Authentication</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-cookies">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Cloud servers (Render / AWS) are frequently challenged by YouTube bot protection. Pasting your YouTube cookies allows the server to authenticate downloads as a real user.
+        </p>
+        <div class="cookies-help-steps">
+          <h4>3 Quick Steps to Get Cookies:</h4>
+          <ol>
+            <li>Install the free extension: <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank" rel="noopener">Get cookies.txt LOCALLY</a></li>
+            <li>Open <a href="https://www.youtube.com" target="_blank" rel="noopener">YouTube.com</a> while signed into your account.</li>
+            <li>Click the extension icon, click <strong>Export</strong>, copy all the text, and paste it below:</li>
+          </ol>
+        </div>
+        <textarea id="cookies-textarea" class="cookies-input" rows="7" placeholder="# Netscape HTTP Cookie File&#10;.youtube.com TRUE / FALSE 1790000000 ..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="btn-cancel-cookies">Cancel</button>
+        <button type="button" class="btn-modal-save" id="btn-save-cookies">
+          <i class="fa-solid fa-check"></i> Save & Activate Cookies
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Toast Notification Container -->
   <div id="toast-container" class="toast-container"></div>

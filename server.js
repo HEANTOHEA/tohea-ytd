@@ -478,15 +478,54 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
   });
 }
 
+function formatYtdlpError(rawErr) {
+  const msg = rawErr || '';
+  if (
+    msg.includes('Sign in to confirm you') ||
+    msg.includes('Failed to extract any player response') ||
+    msg.includes('confirm you’re not a bot') ||
+    msg.includes('bot detection')
+  ) {
+    return 'YouTube requires authentication on cloud servers. Click "YouTube Cookies" in the top bar to paste your cookies and unlock downloads.';
+  }
+  return msg || 'Download failed.';
+}
+
 /* ────────────────────── API Routes ────────────────────── */
 
 app.get('/api/health', (_req, res) => {
+  const hasCookies = Boolean(
+    process.env.YT_COOKIES_PATH && fs.existsSync(process.env.YT_COOKIES_PATH)
+  );
   res.json({
     ok: true,
     ytdlp: HAS_YTDLP,
     ffmpeg: HAS_FFMPEG,
     fullDownload: HAS_YTDLP && HAS_FFMPEG,
+    hasCookies,
   });
+});
+
+app.get('/api/cookies/status', (_req, res) => {
+  const hasCookies = Boolean(
+    process.env.YT_COOKIES_PATH && fs.existsSync(process.env.YT_COOKIES_PATH)
+  );
+  res.json({ ok: true, hasCookies });
+});
+
+app.post('/api/cookies', (req, res) => {
+  try {
+    const raw = (req.body?.cookies || '').trim();
+    if (!raw) {
+      return res.status(400).json({ error: 'Cookies text cannot be empty.' });
+    }
+    const cookiesFile = path.join(__dirname, 'cookies.txt');
+    fs.writeFileSync(cookiesFile, raw, 'utf8');
+    process.env.YT_COOKIES_PATH = cookiesFile;
+    res.json({ ok: true, message: 'YouTube cookies saved successfully!' });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed saving cookies: ' + err.message });
+  }
 });
 
 app.post('/api/analyze', async (req, res) => {
@@ -500,7 +539,7 @@ app.post('/api/analyze', async (req, res) => {
     const metadata = await resolveMetadata(rawUrl);
     res.json({ ok: true, metadata });
   } catch (err) {
-    res.status(400).json({ error: err.message || 'Could not analyze link.' });
+    res.status(400).json({ error: formatYtdlpError(err.message) });
   }
 });
 
@@ -532,7 +571,7 @@ app.get('/api/download', async (req, res) => {
     res.setHeader('X-Download-Source', 'full');
     res.send(file.buffer);
   } catch (err) {
-    res.status(400).json({ error: err.message || 'Download failed.' });
+    res.status(400).json({ error: formatYtdlpError(err.message) });
   }
 });
 
@@ -582,7 +621,7 @@ app.post('/api/download-zip', async (req, res) => {
     res.setHeader('X-Tracks-Included', String(added));
     res.send(buffer);
   } catch (err) {
-    res.status(500).json({ error: err.message || 'ZIP creation failed.' });
+    res.status(500).json({ error: formatYtdlpError(err.message) });
   }
 });
 

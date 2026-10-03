@@ -21,12 +21,79 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentMetadata = null;
   let serverHealth = { ok: false, ytdlp: false, ffmpeg: false, fullDownload: false };
 
+  // Cookies Modal Elements
+  const btnOpenCookies = document.getElementById('btn-open-cookies');
+  const cookiesModal = document.getElementById('cookies-modal');
+  const btnCloseCookies = document.getElementById('btn-close-cookies');
+  const btnCancelCookies = document.getElementById('btn-cancel-cookies');
+  const btnSaveCookies = document.getElementById('btn-save-cookies');
+  const cookiesTextarea = document.getElementById('cookies-textarea');
+  const cookiesStatusText = document.getElementById('cookies-status-text');
+
+  function updateCookiesBadge(hasCookies) {
+    if (!btnOpenCookies) return;
+    if (hasCookies) {
+      btnOpenCookies.classList.add('has-cookies');
+      btnOpenCookies.innerHTML = '<i class="fa-solid fa-circle-check"></i> <span>Cookies Active</span>';
+    } else {
+      btnOpenCookies.classList.remove('has-cookies');
+      btnOpenCookies.innerHTML = '<i class="fa-solid fa-cookie-bite"></i> <span>YouTube Cookies</span>';
+    }
+  }
+
+  function openCookiesModal() {
+    if (cookiesModal) cookiesModal.classList.remove('hidden');
+  }
+
+  function closeCookiesModal() {
+    if (cookiesModal) cookiesModal.classList.add('hidden');
+  }
+
+  if (btnOpenCookies) btnOpenCookies.addEventListener('click', openCookiesModal);
+  if (btnCloseCookies) btnCloseCookies.addEventListener('click', closeCookiesModal);
+  if (btnCancelCookies) btnCancelCookies.addEventListener('click', closeCookiesModal);
+  if (cookiesModal) {
+    cookiesModal.addEventListener('click', (e) => {
+      if (e.target === cookiesModal) closeCookiesModal();
+    });
+  }
+
+  if (btnSaveCookies) {
+    btnSaveCookies.addEventListener('click', async () => {
+      const val = (cookiesTextarea?.value || '').trim();
+      if (!val) {
+        showToast('Please paste your YouTube cookies text.', 'error');
+        return;
+      }
+      btnSaveCookies.disabled = true;
+      btnSaveCookies.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+      try {
+        const res = await fetch('/api/cookies', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ cookies: val }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed saving cookies.');
+        updateCookiesBadge(true);
+        closeCookiesModal();
+        showToast('YouTube cookies saved! Cloud downloads unlocked.', 'success');
+      } catch (err) {
+        showToast(err.message || 'Failed to save cookies.', 'error');
+      } finally {
+        btnSaveCookies.disabled = false;
+        btnSaveCookies.innerHTML = '<i class="fa-solid fa-check"></i> Save & Activate Cookies';
+      }
+    });
+  }
+
   // Fetch server health on boot
   fetch('/api/health')
     .then((r) => r.json())
     .then((data) => {
       serverHealth = data;
       updateModeBadge();
+      updateCookiesBadge(Boolean(data.hasCookies));
     })
     .catch(() => {
       serverHealth = { ok: false, ytdlp: false, ffmpeg: false, fullDownload: false };
@@ -497,15 +564,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = 'toast';
+    const isCookiePrompt = message && message.includes('YouTube Cookies');
+    if (isCookiePrompt) {
+      toast.style.cursor = 'pointer';
+      toast.title = 'Click to open YouTube Cookies modal';
+      toast.addEventListener('click', openCookiesModal);
+    }
     const icon =
       type === 'error' ? 'fa-circle-xmark' : type === 'info' ? 'fa-circle-info' : 'fa-circle-check';
     toast.innerHTML = `<i class="fa-solid ${icon}"></i> <span>${escapeHtml(message)}</span>`;
     toastContainer.appendChild(toast);
+    const duration = isCookiePrompt ? 9000 : 4500;
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transform = 'translateX(100%)';
       toast.style.transition = 'all 0.3s ease';
       setTimeout(() => toast.remove(), 300);
-    }, 4000);
+    }, duration);
   }
 });
