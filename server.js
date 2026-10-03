@@ -420,15 +420,37 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
     const videoId = extractVideoId(videoUrl);
     const targetUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : videoUrl;
 
-    const args = [
-      '-f', 'ba/ba*/b/best',
-      '-x',                          // extract audio
-      '--audio-format', 'mp3',       // convert to MP3
-      '--audio-quality', `${bitrate}K`,
-      '--no-playlist',               // single video only
-      ...getYtdlpBaseArgs(),
-      '-o', outTemplate,
-      targetUrl,
+    const argsVariants = [
+      [
+        '-f', 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',
+        '-x',
+        '--audio-format', 'mp3',
+        '--audio-quality', `${bitrate}K`,
+        '--no-playlist',
+        ...getYtdlpBaseArgs(),
+        '-o', outTemplate,
+        targetUrl,
+      ],
+      [
+        '-f', 'bestaudio/best',
+        '-x',
+        '--audio-format', 'mp3',
+        '--audio-quality', `${bitrate}K`,
+        '--no-playlist',
+        ...getYtdlpBaseArgs(),
+        '-o', outTemplate,
+        targetUrl,
+      ],
+      [
+        '-f', 'ba/ba*/b/best',
+        '-x',
+        '--audio-format', 'mp3',
+        '--audio-quality', `${bitrate}K`,
+        '--no-playlist',
+        ...getYtdlpBaseArgs(),
+        '-o', outTemplate,
+        targetUrl,
+      ],
     ];
 
     const ytdlpBin = getYtdlpExecutable();
@@ -436,17 +458,25 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
     function execute(cmd, cmdArgs) {
       execFile(cmd, cmdArgs, { maxBuffer: 50 * 1024 * 1024, timeout: 300000 }, (err, stdout, stderr) => {
         if (err) {
+          const errText = `${stderr || ''}\n${err.message || ''}`;
+          const formatUnavailable = /Requested format is not available|No suitable formats|No video formats|is not available/i.test(errText);
+          const currentVariantIndex = argsVariants.findIndex((variant) => variant === cmdArgs);
+          const hasMoreVariants = currentVariantIndex >= 0 && currentVariantIndex < argsVariants.length - 1;
+
+          if (hasMoreVariants && formatUnavailable) {
+            return execute(cmd, argsVariants[currentVariantIndex + 1]);
+          }
+
           if (cmd === ytdlpBin && cmd !== 'yt-dlp') {
-            return execute('yt-dlp', args);
+            return execute('yt-dlp', cmdArgs);
           } else if (cmd === 'yt-dlp' || cmd === ytdlpBin) {
-            return execute('python3', ['-m', 'yt_dlp', ...args]);
+            return execute('python3', ['-m', 'yt_dlp', ...cmdArgs]);
           } else if (cmd === 'python3') {
-            return execute('python', ['-m', 'yt_dlp', ...args]);
+            return execute('python', ['-m', 'yt_dlp', ...cmdArgs]);
           }
           return reject(new Error(stderr || err.message || 'yt-dlp download failed'));
         }
 
-        // Find the output file
         const files = fs.readdirSync(tmpDir).filter((f) => f.startsWith(uid) && f.endsWith('.mp3'));
         if (files.length === 0) {
           const anyFiles = fs.readdirSync(tmpDir).filter((f) => f.startsWith(uid));
@@ -476,7 +506,7 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
       });
     }
 
-    execute(ytdlpBin, args);
+    execute(ytdlpBin, argsVariants[0]);
   });
 }
 
