@@ -18,11 +18,14 @@ RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o 
 # Set working directory
 WORKDIR /app
 
-# Copy dependency specifications and install production dependencies
+# Copy package files and scripts needed for install
 COPY package*.json ./
+COPY scripts/ ./scripts/
+
+# Install dependencies safely
 RUN npm ci --omit=dev || npm install --omit=dev
 
-# Copy application files
+# Copy remaining application files
 COPY . .
 
 # Set environment
@@ -30,7 +33,7 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
-# Cloud platforms like Render / Railway / Cloud Run supply dynamic $PORT
+# Expose port
 EXPOSE 3000
 
 # Health check
