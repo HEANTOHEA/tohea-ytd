@@ -4,3 +4,4 @@ downloads/
 *.log
 .agents/
 cloudflared.exe
+bin/

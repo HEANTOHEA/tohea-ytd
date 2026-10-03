@@ -43,8 +43,23 @@ app.use(
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(__dirname));
 
-// Automatically register common Python Scripts and static_ffmpeg bin paths to PATH
-const candidateDirs = [];
+function getFfmpegPath() {
+  try {
+    const ffmpegStatic = require('ffmpeg-static');
+    if (ffmpegStatic && fs.existsSync(ffmpegStatic)) {
+      return ffmpegStatic;
+    }
+  } catch (_) {}
+  return null;
+}
+
+// Register candidate directories to PATH
+const candidateDirs = [path.join(__dirname, 'bin')];
+const staticFfmpegBinary = getFfmpegPath();
+if (staticFfmpegBinary) {
+  candidateDirs.unshift(path.dirname(staticFfmpegBinary));
+}
+
 const appData = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
 const pythonBase = path.join(appData, 'Python');
 
@@ -62,7 +77,6 @@ candidateDirs.push(path.join(appData, 'Python', 'Python313', 'site-packages', 's
 candidateDirs.push('C:\\Python313\\Scripts');
 candidateDirs.push('C:\\Python313');
 candidateDirs.push('C:\\ffmpeg\\bin');
-candidateDirs.push(path.join(__dirname, 'bin'));
 
 for (const dir of candidateDirs) {
   if (fs.existsSync(dir) && !process.env.PATH.includes(dir)) {
@@ -70,31 +84,59 @@ for (const dir of candidateDirs) {
   }
 }
 
+function getYtdlpExecutable() {
+  const localBin = path.join(__dirname, 'bin', process.platform === 'win32' ? 'yt-dlp.exe' : 'yt-dlp');
+  if (fs.existsSync(localBin)) {
+    return localBin;
+  }
+  return 'yt-dlp';
+}
+
 function isYtdlpAvailable() {
+  const exec = getYtdlpExecutable();
   try {
-    execSync('yt-dlp --version', { stdio: 'pipe' });
+    execSync(`"${exec}" --version`, { stdio: 'pipe' });
     return true;
   } catch (_) {
     try {
-      execSync('python -m yt_dlp --version', { stdio: 'pipe' });
+      execSync('yt-dlp --version', { stdio: 'pipe' });
       return true;
     } catch (_) {
       try {
         execSync('python3 -m yt_dlp --version', { stdio: 'pipe' });
         return true;
       } catch (_) {
-        return false;
+        try {
+          execSync('python -m yt_dlp --version', { stdio: 'pipe' });
+          return true;
+        } catch (_) {
+          return false;
+        }
       }
     }
   }
 }
 
 function isFfmpegAvailable() {
+  if (getFfmpegPath()) return true;
   try {
     execSync('ffmpeg -version', { stdio: 'pipe' });
     return true;
   } catch (_) {
     return false;
+  }
+}
+
+// Automatically install yt-dlp on launch if missing
+if (!isYtdlpAvailable()) {
+  try {
+    console.log('[server] yt-dlp not detected. Attempting automated installation via scripts/install-ytdlp.js...');
+    const installScript = path.join(__dirname, 'scripts', 'install-ytdlp.js');
+    if (fs.existsSync(installScript)) {
+      execSync(`node "${installScript}"`, { stdio: 'inherit' });
+    }
+  } catch (err) {
+    console.warn('[server] Auto-install yt-dlp warning:', err.message);
   }
 }
 
@@ -178,6 +220,10 @@ function isPlaylistUrl(url) {
 
 function getYtdlpBaseArgs() {
   const base = ['--no-warnings', '--no-check-certificates'];
+  const ffmpegPath = getFfmpegPath();
+  if (ffmpegPath) {
+    base.push('--ffmpeg-location', ffmpegPath);
+  }
   if (process.env.YT_COOKIES_PATH && fs.existsSync(process.env.YT_COOKIES_PATH)) {
     base.push('--cookies', process.env.YT_COOKIES_PATH);
   }
@@ -197,31 +243,44 @@ function ytdlpGetJson(url, extraArgs = []) {
       url,
     ];
 
-    execFile('yt-dlp', args, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (err, stdout, stderr) => {
+    const ytdlpBin = getYtdlpExecutable();
+
+    execFile(ytdlpBin, args, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (err, stdout, stderr) => {
       if (err) {
-        // Fallback to python -m yt_dlp if direct command fails
-        return execFile(
-          'python',
-          ['-m', 'yt_dlp', ...args],
-          { maxBuffer: 50 * 1024 * 1024, timeout: 120000 },
-          (pyErr, pyStdout, pyStderr) => {
-            if (pyErr) {
-              // Fallback to python3 -m yt_dlp
+        const tryFallback = () => {
+          // Fallback to python3 -m yt_dlp
+          return execFile(
+            'python3',
+            ['-m', 'yt_dlp', ...args],
+            { maxBuffer: 50 * 1024 * 1024, timeout: 120000 },
+            (py3Err, py3Stdout) => {
+              if (!py3Err) {
+                return parseLines(py3Stdout);
+              }
+              // Fallback to python -m yt_dlp
               return execFile(
-                'python3',
+                'python',
                 ['-m', 'yt_dlp', ...args],
                 { maxBuffer: 50 * 1024 * 1024, timeout: 120000 },
-                (py3Err, py3Stdout, py3Stderr) => {
-                  if (py3Err) {
-                    return reject(new Error(py3Stderr || pyStderr || stderr || py3Err.message || 'yt-dlp failed'));
+                (pyErr, pyStdout) => {
+                  if (!pyErr) {
+                    return parseLines(pyStdout);
                   }
-                  parseLines(py3Stdout);
+                  return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
                 }
               );
             }
-            parseLines(pyStdout);
-          }
-        );
+          );
+        };
+
+        if (ytdlpBin !== 'yt-dlp') {
+          return execFile('yt-dlp', args, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (e2, s2) => {
+            if (!e2) return parseLines(s2);
+            tryFallback();
+          });
+        }
+
+        return tryFallback();
       }
       parseLines(stdout);
     });
@@ -359,15 +418,17 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
       targetUrl,
     ];
 
+    const ytdlpBin = getYtdlpExecutable();
+
     function execute(cmd, cmdArgs) {
       execFile(cmd, cmdArgs, { maxBuffer: 50 * 1024 * 1024, timeout: 300000 }, (err, stdout, stderr) => {
         if (err) {
-          if (cmd === 'yt-dlp') {
-            // Try python -m yt_dlp fallback
-            return execute('python', ['-m', 'yt_dlp', ...args]);
-          } else if (cmd === 'python') {
-            // Try python3 -m yt_dlp fallback
+          if (cmd === ytdlpBin && cmd !== 'yt-dlp') {
+            return execute('yt-dlp', args);
+          } else if (cmd === 'yt-dlp' || cmd === ytdlpBin) {
             return execute('python3', ['-m', 'yt_dlp', ...args]);
+          } else if (cmd === 'python3') {
+            return execute('python', ['-m', 'yt_dlp', ...args]);
           }
           return reject(new Error(stderr || err.message || 'yt-dlp download failed'));
         }
@@ -402,7 +463,7 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
       });
     }
 
-    execute('yt-dlp', args);
+    execute(ytdlpBin, args);
   });
 }
 
