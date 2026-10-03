@@ -222,6 +222,7 @@ function getYtdlpBaseArgs() {
   const base = [
     '--no-warnings',
     '--no-check-certificates',
+    '--js-runtimes', 'node',
     '--user-agent',
     'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
   ];
@@ -420,6 +421,7 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
     const targetUrl = videoId ? `https://www.youtube.com/watch?v=${videoId}` : videoUrl;
 
     const args = [
+      '-f', 'ba/ba*/b/best',
       '-x',                          // extract audio
       '--audio-format', 'mp3',       // convert to MP3
       '--audio-quality', `${bitrate}K`,
