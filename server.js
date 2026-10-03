@@ -219,10 +219,20 @@ function isPlaylistUrl(url) {
 /* ────────────────────── yt-dlp Metadata ────────────────────── */
 
 function getYtdlpBaseArgs() {
-  const base = ['--no-warnings', '--no-check-certificates'];
+  const base = [
+    '--no-warnings',
+    '--no-check-certificates',
+    '--extractor-args', 'youtube:player_client=android,ios,web',
+  ];
   const ffmpegPath = getFfmpegPath();
   if (ffmpegPath) {
     base.push('--ffmpeg-location', ffmpegPath);
+  }
+  if (!process.env.YT_COOKIES_PATH) {
+    const rootCookies = path.join(__dirname, 'cookies.txt');
+    if (fs.existsSync(rootCookies)) {
+      process.env.YT_COOKIES_PATH = rootCookies;
+    }
   }
   if (process.env.YT_COOKIES_PATH && fs.existsSync(process.env.YT_COOKIES_PATH)) {
     base.push('--cookies', process.env.YT_COOKIES_PATH);

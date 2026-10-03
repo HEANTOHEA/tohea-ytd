@@ -5,3 +5,5 @@ downloads/
 .agents/
 cloudflared.exe
 bin/
+cookies.txt
+yt-cookies.txt
