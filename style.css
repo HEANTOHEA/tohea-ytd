@@ -125,17 +125,25 @@ h1, h2, h3, h4, h5, h6 {
   text-decoration: none;
 }
 
+.brand-logo-img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 10px rgba(255, 0, 51, 0.45));
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.brand-logo:hover .brand-logo-img {
+  transform: scale(1.08);
+}
+
 .logo-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--gradient-btn);
-  border-radius: var(--radius-sm);
+  width: 42px;
+  height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  font-size: 1.25rem;
-  box-shadow: 0 4px 12px rgba(255, 0, 51, 0.4);
 }
 
 .brand-name {

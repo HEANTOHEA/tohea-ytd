@@ -18,6 +18,10 @@
   <!-- Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
+
   <!-- Custom Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
@@ -27,22 +31,12 @@
   <header class="site-header">
     <div class="container header-container">
       <a href="#" class="brand-logo">
-        <div class="logo-icon">
-          <i class="fa-brands fa-youtube"></i>
-        </div>
-        <span class="brand-name">YTMusic<span class="highlight">Mp3</span></span>
+        <img src="logo.png" alt="TOHEA-YTD Logo" class="brand-logo-img">
+        <span class="brand-name">TOHEA-YTD<span class="highlight">Mp3</span></span>
       </a>
       
       <nav class="nav-links">
-        <a href="#how-it-works"><i class="fa-solid fa-circle-info"></i> How It Works</a>
         <a href="#features"><i class="fa-solid fa-star"></i> Features</a>
-        <a href="#faq"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-        <button type="button" class="btn-cookies-nav" id="btn-open-server-settings">
-          <i class="fa-solid fa-server"></i> <span id="server-status-label">Backend API</span>
-        </button>
-        <button type="button" class="btn-cookies-nav" id="btn-open-telegram-guide">
-          <i class="fa-brands fa-telegram"></i> <span>Telegram Guide</span>
-        </button>
       </nav>
     </div>
   </header>
@@ -53,15 +47,11 @@
     <div class="container hero-container">
       <div class="hero-badge">
         <span class="badge-pulse"></span>
-        <i class="fa-brands fa-telegram"></i> Telegram Mini App & Cloud Backend (Approach B)
+        <img src="logo.png" alt="" style="width: 16px; height: 16px; object-fit: contain; vertical-align: middle; margin-right: 4px;"> Welcome to Tohea-YTD <i class="fa-solid fa-music"></i>
       </div>
 
-      <h1 class="hero-title">Download YouTube Music <span class="gradient-text">Songs to MP3</span></h1>
-      <p class="hero-subtitle">Direct, high-speed 320 Kbps MP3 downloads powered by your private cloud backend (Render / Railway / Local). Seamlessly works inside Telegram Mini Apps or any browser.</p>
-      
-      <p id="backend-status-pill" class="download-mode-badge mode-full">
-        <i class="fa-solid fa-circle-notch fa-spin"></i> <span id="backend-status-text">Checking Backend API connection...</span>
-      </p>
+      <h1 class="hero-title">Download YouTube Music <span class="gradient-text">For Producer</span></h1>
+      <p class="hero-subtitle">High-quality 320 Kbps MP3 sound.</p>
 
       <!-- Search & Download Card -->
       <div class="search-card-wrapper">
@@ -110,15 +100,14 @@
 
             <!-- Quick Demo Button -->
             <div class="demo-triggers">
-              <span>Try Demo:</span>
-              <button type="button" class="demo-btn" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Rick Astley</button>
-              <button type="button" class="demo-btn" data-url="https://music.youtube.com/watch?v=kJQP7kiw5Fk">Despacito</button>
+              <span>Demo</span>
+              <button type="button" class="demo-btn" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Test Music Download</button>
             </div>
           </div>
         </form>
 
         <div class="notice-bar">
-          <i class="fa-solid fa-shield-halved"></i> Direct MP3 Downloads • Zero Ads • No Sketchy Mirrors • Telegram Ready!
+          <i class="fa-solid fa-shield-halved"></i> Direct MP3 Downloads • Zero Ads • No Sketchy Mirrors
         </div>
       </div>
 
@@ -130,147 +119,48 @@
   </section>
 
   <!-- How It Works Section -->
-  <section class="section how-it-works-section" id="how-it-works">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">Direct Architecture</span>
-        <h2 class="section-title">How Approach B Works</h2>
-        <p class="section-desc">Clean separation between static frontend (GitHub Pages / Telegram) and your private cloud backend.</p>
-      </div>
-
-      <div class="steps-grid">
-        <div class="step-card">
-          <div class="step-num">01</div>
-          <div class="step-icon text-red">
-            <i class="fa-solid fa-cloud"></i>
-          </div>
-          <h3>Private Cloud Backend</h3>
-          <p>Your backend runs <strong>yt-dlp + ffmpeg</strong> on Render, Railway, or locally. It handles audio extraction cleanly without third-party popups.</p>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">02</div>
-          <div class="step-icon text-purple">
-            <i class="fa-brands fa-telegram"></i>
-          </div>
-          <h3>Static Telegram Mini App</h3>
-          <p>Hosted on GitHub Pages or Vercel. Users paste YouTube links directly inside Telegram or any browser.</p>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">03</div>
-          <div class="step-icon text-cyan">
-            <i class="fa-solid fa-bolt"></i>
-          </div>
-          <h3>Direct MP3 Download</h3>
-          <p>One click downloads true 320 Kbps MP3 files straight into the user's device storage with proper song title and metadata.</p>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Features Section -->
   <section class="section features-section" id="features">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Key Advantages</span>
-        <h2 class="section-title">Why Approach B is the Ultimate Setup</h2>
-        <p class="section-desc">Reliable, fast, and completely immune to public API shutdowns or antivirus warnings.</p>
       </div>
 
       <div class="features-grid">
         <div class="feature-box">
           <div class="feature-icon"><i class="fa-solid fa-download"></i></div>
-          <h3>Direct In-App MP3s</h3>
-          <p>Files download immediately from your API. No redirects to ad-heavy websites or sketchy converter services.</p>
+          <h3>Download YouTube Music</h3>
+          <p>Paste Link > Click Download > Get MP3 File.</p>
         </div>
 
         <div class="feature-box">
           <div class="feature-icon"><i class="fa-solid fa-file-zipper"></i></div>
-          <h3>Playlist ZIP Support</h3>
+          <h3>YouTube Playlist</h3>
           <p>Paste a YouTube playlist and download all tracks bundled into a single ZIP archive automatically.</p>
         </div>
-
-        <div class="feature-box">
-          <div class="feature-icon"><i class="fa-brands fa-telegram"></i></div>
-          <h3>Telegram Haptics & Integration</h3>
-          <p>Full support for Telegram WebApp SDK, viewport auto-expansion, and tactile mobile feedback.</p>
-        </div>
-
-        <div class="feature-box">
-          <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
-          <h3>100% Virus & Malware Free</h3>
-          <p>Zero connections to untrusted domains. Runs on your own clean server with zero antivirus alerts.</p>
-        </div>
       </div>
     </div>
   </section>
 
-  <!-- FAQ Section -->
-  <section class="section faq-section" id="faq">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-tag">FAQ</span>
-        <h2 class="section-title">Frequently Asked Questions</h2>
-      </div>
-
-      <div class="faq-accordion">
-        <div class="accordion-item active">
-          <button class="accordion-header">
-            <span>Where can I host the backend for free?</span>
-            <i class="fa-solid fa-chevron-down accordion-icon"></i>
-          </button>
-          <div class="accordion-content">
-            <p>You can deploy this repository directly to <strong>Render</strong> (free Docker web service), <strong>Railway</strong>, or <strong>Fly.io</strong>. The repository already contains <code>Dockerfile</code> and <code>render.yaml</code> ready for 1-click deployment!</p>
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>Can I test it locally on my computer?</span>
-            <i class="fa-solid fa-chevron-down accordion-icon"></i>
-          </button>
-          <div class="accordion-content">
-            <p>Yes! Simply run <code>npm start</code> in this folder. The backend will start on <code>http://localhost:3000</code> and the frontend will automatically connect to it.</p>
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>How do I connect my frontend on GitHub Pages to my Cloud Backend?</span>
-            <i class="fa-solid fa-chevron-down accordion-icon"></i>
-          </button>
-          <div class="accordion-content">
-            <p>Click the <strong>Backend API</strong> button in the navigation bar, paste your deployed backend URL (e.g. <code>https://your-app.onrender.com</code>), and click <strong>Save & Connect</strong>. It is saved in your browser's memory.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
   <!-- Footer -->
   <footer class="site-footer">
     <div class="container footer-container">
       <div class="footer-brand">
         <div class="brand-logo">
-          <div class="logo-icon"><i class="fa-brands fa-youtube"></i></div>
-          <span class="brand-name">YTMusic<span class="highlight">Mp3</span></span>
+          <img src="logo.png" alt="TOHEA-YTD Logo" class="brand-logo-img">
+          <span class="brand-name">Tohea-<span class="highlight">YTD</span></span>
         </div>
         <p class="footer-disclaimer">
-          Use only for music you have rights to download. © 2026 YTMusicMp3 — Approach B Cloud Backend Architecture.
+          Use only for music you have rights to download. © 2026 Tohea-YTD.
         </p>
       </div>
 
-      <div class="footer-links">
-        <a href="#how-it-works">How It Works</a>
-        <a href="#features">Features</a>
-        <a href="#faq">FAQ</a>
-      </div>
     </div>
   </footer>
 
   <!-- Backend Settings Modal -->
-  <div class="modal-overlay hidden" id="server-modal">
+  <!-- <div class="modal-overlay hidden" id="server-modal">
     <div class="modal-card">
       <div class="modal-header">
         <h3><i class="fa-solid fa-server"></i> Backend API Configuration</h3>
@@ -321,10 +211,10 @@
         </button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Telegram Setup Modal -->
-  <div class="modal-overlay hidden" id="telegram-modal">
+  <!-- <div class="modal-overlay hidden" id="telegram-modal">
     <div class="modal-card">
       <div class="modal-header">
         <h3><i class="fa-brands fa-telegram"></i> Telegram Mini App Setup</h3>
@@ -348,10 +238,10 @@
         <button type="button" class="btn-modal-cancel" id="btn-dismiss-telegram">Got it!</button>
       </div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Toast Notification Container -->
-  <div id="toast-container" class="toast-container"></div>
+    <div id="toast-container" class="toast-container"></div>
 
   <!-- Custom JS -->
   <script src="app.js"></script>
