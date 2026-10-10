@@ -229,6 +229,27 @@ h1, h2, h3, h4, h5, h6 {
   animation: pulse-ring 1.8s infinite;
 }
 
+.hero-badge-logo {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  vertical-align: middle;
+  filter: drop-shadow(0 0 4px rgba(255, 0, 51, 0.8));
+  animation: logo-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  display: inline-block;
+}
+
+@keyframes logo-pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 3px rgba(255, 0, 51, 0.6));
+  }
+  50% {
+    transform: scale(1.18);
+    filter: drop-shadow(0 0 10px rgba(255, 0, 51, 0.95)) drop-shadow(0 0 18px rgba(255, 0, 51, 0.6));
+  }
+}
+
 @keyframes pulse-ring {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 0, 51, 0.7);
