@@ -1,6 +1,7 @@
 /**
- * YouTube Music Downloader — local server
- * Serves the site and resolves downloads via yt-dlp + ffmpeg.
+ * YouTube Music Downloader — Backend API Server
+ * Serves the site and handles downloads via yt-dlp + ffmpeg.
+ * Supports running locally (localhost:3000) or deploying to Render/Railway/Fly.io.
  */
 
 const express = require('express');

@@ -294,6 +294,44 @@ h1, h2, h3, h4, h5, h6 {
   border-color: rgba(0, 210, 255, 0.3) !important;
 }
 
+.btn-server-1 {
+  background: var(--gradient-btn) !important;
+  color: #ffffff !important;
+  border: 1px solid var(--primary-red) !important;
+  box-shadow: 0 4px 15px rgba(255, 0, 51, 0.35);
+  font-weight: 700 !important;
+}
+
+.btn-server-1:hover {
+  background: var(--gradient-btn-hover) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 0, 51, 0.5);
+}
+
+.btn-server-2 {
+  background: rgba(145, 71, 255, 0.18) !important;
+  color: #c79bff !important;
+  border-color: rgba(145, 71, 255, 0.4) !important;
+}
+
+.btn-server-2:hover {
+  background: rgba(145, 71, 255, 0.35) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
+.btn-server-3 {
+  background: rgba(0, 210, 255, 0.15) !important;
+  color: var(--accent-cyan) !important;
+  border-color: rgba(0, 210, 255, 0.35) !important;
+}
+
+.btn-server-3:hover {
+  background: rgba(0, 210, 255, 0.3) !important;
+  color: #ffffff !important;
+  transform: translateY(-2px);
+}
+
 .batch-hint {
   font-size: 0.82rem;
   color: var(--text-muted);

@@ -2,10 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>YouTube Music Downloader — Download Songs & Playlists as MP3</title>
-  <meta name="description" content="Download YouTube Music songs, videos and playlists as MP3 or M4A. Paste a link, pick quality, and save tracks or ZIP archives.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>YouTube Music Downloader — Telegram Mini App & Cloud Backend</title>
+  <meta name="description" content="Download YouTube Music songs and playlists as MP3. Connects to your cloud backend (Render/Railway/Local) for direct in-app downloads.">
   <meta name="theme-color" content="#0f0f0f">
+
+  <!-- Telegram Web App SDK -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,8 +37,11 @@
         <a href="#how-it-works"><i class="fa-solid fa-circle-info"></i> How It Works</a>
         <a href="#features"><i class="fa-solid fa-star"></i> Features</a>
         <a href="#faq"><i class="fa-solid fa-circle-question"></i> FAQ</a>
-        <button type="button" class="btn-cookies-nav" id="btn-open-cookies">
-          <i class="fa-solid fa-cookie-bite"></i> <span id="cookies-status-text">YouTube Cookies</span>
+        <button type="button" class="btn-cookies-nav" id="btn-open-server-settings">
+          <i class="fa-solid fa-server"></i> <span id="server-status-label">Backend API</span>
+        </button>
+        <button type="button" class="btn-cookies-nav" id="btn-open-telegram-guide">
+          <i class="fa-brands fa-telegram"></i> <span>Telegram Guide</span>
         </button>
       </nav>
     </div>
@@ -47,12 +53,15 @@
     <div class="container hero-container">
       <div class="hero-badge">
         <span class="badge-pulse"></span>
-        <i class="fa-brands fa-youtube"></i> YouTube Music Downloader MP3
+        <i class="fa-brands fa-telegram"></i> Telegram Mini App & Cloud Backend (Approach B)
       </div>
 
       <h1 class="hero-title">Download YouTube Music <span class="gradient-text">Songs to MP3</span></h1>
-      <p class="hero-subtitle">Paste a song, video or playlist link from YouTube / YouTube Music. Download individual tracks or grab the whole playlist in one ZIP — high quality MP3, no app install.</p>
-      <p id="download-mode-badge" class="download-mode-badge mode-preview">Checking server...</p>
+      <p class="hero-subtitle">Direct, high-speed 320 Kbps MP3 downloads powered by your private cloud backend (Render / Railway / Local). Seamlessly works inside Telegram Mini Apps or any browser.</p>
+      
+      <p id="backend-status-pill" class="download-mode-badge mode-full">
+        <i class="fa-solid fa-circle-notch fa-spin"></i> <span id="backend-status-text">Checking Backend API connection...</span>
+      </p>
 
       <!-- Search & Download Card -->
       <div class="search-card-wrapper">
@@ -65,7 +74,7 @@
                    inputmode="url"
                    id="id_url" 
                    class="url-input" 
-                   placeholder="Paste YouTube or YouTube Music song or playlist link..." 
+                   placeholder="Paste YouTube or YouTube Music link (song or playlist)..." 
                    required 
                    autocomplete="off"
                    aria-label="YouTube or YouTube Music link">
@@ -91,7 +100,7 @@
             <label class="option-label" for="quality-select">
               <i class="fa-solid fa-sliders"></i> Output quality
               <select id="quality-select" class="quality-select" aria-label="Audio bitrate">
-                <option value="320" selected>320 Kbps MP3</option>
+                <option value="320" selected>320 Kbps MP3 (Best Audio)</option>
                 <option value="256">256 Kbps MP3</option>
                 <option value="192">192 Kbps</option>
                 <option value="128">128 Kbps</option>
@@ -101,15 +110,15 @@
 
             <!-- Quick Demo Button -->
             <div class="demo-triggers">
-              <span>Test Examples:</span>
-              <button type="button" class="demo-btn" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Demo Video</button>
-              <button type="button" class="demo-btn" data-url="https://music.youtube.com/watch?v=dQw4w9WgXcQ">Demo YT Music</button>
+              <span>Try Demo:</span>
+              <button type="button" class="demo-btn" data-url="https://www.youtube.com/watch?v=dQw4w9WgXcQ">Rick Astley</button>
+              <button type="button" class="demo-btn" data-url="https://music.youtube.com/watch?v=kJQP7kiw5Fk">Despacito</button>
             </div>
           </div>
         </form>
 
         <div class="notice-bar">
-          <i class="fa-solid fa-shield-halved"></i> 100% Free, Safe & Cloud-based. No Software or Extensions Required!
+          <i class="fa-solid fa-shield-halved"></i> Direct MP3 Downloads • Zero Ads • No Sketchy Mirrors • Telegram Ready!
         </div>
       </div>
 
@@ -124,46 +133,37 @@
   <section class="section how-it-works-section" id="how-it-works">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Quick Guide</span>
-        <h2 class="section-title">How to download YouTube Music to MP3</h2>
-        <p class="section-desc">Copy a link, paste it above, and save tracks in seconds — works on phone and desktop browsers.</p>
+        <span class="section-tag">Direct Architecture</span>
+        <h2 class="section-title">How Approach B Works</h2>
+        <p class="section-desc">Clean separation between static frontend (GitHub Pages / Telegram) and your private cloud backend.</p>
       </div>
 
       <div class="steps-grid">
         <div class="step-card">
           <div class="step-num">01</div>
           <div class="step-icon text-red">
-            <i class="fa-solid fa-link"></i>
+            <i class="fa-solid fa-cloud"></i>
           </div>
-          <h3>Copy Music Link</h3>
-          <p>Open YouTube or YouTube Music app / website. Click <strong>Share</strong> on any song, video or playlist and click <strong>Copy Link</strong>.</p>
+          <h3>Private Cloud Backend</h3>
+          <p>Your backend runs <strong>yt-dlp + ffmpeg</strong> on Render, Railway, or locally. It handles audio extraction cleanly without third-party popups.</p>
         </div>
 
         <div class="step-card">
           <div class="step-num">02</div>
           <div class="step-icon text-purple">
-            <i class="fa-solid fa-paste"></i>
+            <i class="fa-brands fa-telegram"></i>
           </div>
-          <h3>Paste the URL</h3>
-          <p>Paste the copied link into the field at the top of this page and click <strong>Download</strong>.</p>
+          <h3>Static Telegram Mini App</h3>
+          <p>Hosted on GitHub Pages or Vercel. Users paste YouTube links directly inside Telegram or any browser.</p>
         </div>
 
         <div class="step-card">
           <div class="step-num">03</div>
           <div class="step-icon text-cyan">
-            <i class="fa-solid fa-arrows-rotate"></i>
+            <i class="fa-solid fa-bolt"></i>
           </div>
-          <h3>Pick quality</h3>
-          <p>Choose your preferred bitrate (320 Kbps MP3 recommended) from the dropdown under the input.</p>
-        </div>
-
-        <div class="step-card">
-          <div class="step-num">04</div>
-          <div class="step-icon text-green">
-            <i class="fa-solid fa-circle-down"></i>
-          </div>
-          <h3>Save MP3 or ZIP</h3>
-          <p>Click <strong>Download MP3</strong> on each track, or use <strong>ZIP Download</strong> for entire playlists.</p>
+          <h3>Direct MP3 Download</h3>
+          <p>One click downloads true 320 Kbps MP3 files straight into the user's device storage with proper song title and metadata.</p>
         </div>
       </div>
     </div>
@@ -173,133 +173,75 @@
   <section class="section features-section" id="features">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Why Choose Us</span>
-        <h2 class="section-title">Key Features of YouTube Music Downloader</h2>
-        <p class="section-desc">Fast online converter — batch ZIP, artwork download, and multiple quality options.</p>
+        <span class="section-tag">Key Advantages</span>
+        <h2 class="section-title">Why Approach B is the Ultimate Setup</h2>
+        <p class="section-desc">Reliable, fast, and completely immune to public API shutdowns or antivirus warnings.</p>
       </div>
 
       <div class="features-grid">
         <div class="feature-box">
-          <div class="feature-icon"><i class="fa-solid fa-bolt-lightning"></i></div>
-          <h3>Instant downloads</h3>
-          <p>Paste a link and get downloadable files in seconds — no desktop software or browser extension.</p>
-        </div>
-
-        <div class="feature-box">
-          <div class="feature-icon"><i class="fa-solid fa-sliders"></i></div>
-          <h3>Quality options</h3>
-          <p>Select 320, 256, 192, 128, or 64 Kbps depending on your storage and listening needs.</p>
+          <div class="feature-icon"><i class="fa-solid fa-download"></i></div>
+          <h3>Direct In-App MP3s</h3>
+          <p>Files download immediately from your API. No redirects to ad-heavy websites or sketchy converter services.</p>
         </div>
 
         <div class="feature-box">
           <div class="feature-icon"><i class="fa-solid fa-file-zipper"></i></div>
-          <h3>Playlist ZIP</h3>
-          <p>Download every track from a playlist in one ZIP file with a single click.</p>
+          <h3>Playlist ZIP Support</h3>
+          <p>Paste a YouTube playlist and download all tracks bundled into a single ZIP archive automatically.</p>
         </div>
 
         <div class="feature-box">
-          <div class="feature-icon"><i class="fa-solid fa-compact-disc"></i></div>
-          <h3>Video & Audio</h3>
-          <p>Works with both YouTube videos and YouTube Music tracks — converts to MP3 automatically.</p>
+          <div class="feature-icon"><i class="fa-brands fa-telegram"></i></div>
+          <h3>Telegram Haptics & Integration</h3>
+          <p>Full support for Telegram WebApp SDK, viewport auto-expansion, and tactile mobile feedback.</p>
         </div>
 
         <div class="feature-box">
-          <div class="feature-icon"><i class="fa-solid fa-cloud-arrow-down"></i></div>
-          <h3>No App Installation</h3>
-          <p>Fully online web tool. Works in Chrome, Safari, Firefox, Edge, iOS Safari, and Android Chrome.</p>
-        </div>
-
-        <div class="feature-box">
-          <div class="feature-icon"><i class="fa-solid fa-user-shield"></i></div>
-          <h3>100% Free & Secure</h3>
-          <p>No registration required. Clean interface with strict user privacy protections.</p>
+          <div class="feature-icon"><i class="fa-solid fa-shield-halved"></i></div>
+          <h3>100% Virus & Malware Free</h3>
+          <p>Zero connections to untrusted domains. Runs on your own clean server with zero antivirus alerts.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Supported Platforms -->
-  <section class="section platforms-section">
-    <div class="container">
-      <h3 class="platforms-heading">Compatible across all major devices & platforms</h3>
-      <div class="platforms-grid">
-        <div class="platform-card">
-          <i class="fa-brands fa-windows"></i>
-          <span>Windows</span>
-        </div>
-        <div class="platform-card">
-          <i class="fa-brands fa-apple"></i>
-          <span>macOS & iOS</span>
-        </div>
-        <div class="platform-card">
-          <i class="fa-brands fa-android"></i>
-          <span>Android</span>
-        </div>
-        <div class="platform-card">
-          <i class="fa-brands fa-linux"></i>
-          <span>Linux</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ Accordion Section -->
+  <!-- FAQ Section -->
   <section class="section faq-section" id="faq">
     <div class="container">
       <div class="section-header">
-        <span class="section-tag">Help Center</span>
+        <span class="section-tag">FAQ</span>
         <h2 class="section-title">Frequently Asked Questions</h2>
-        <p class="section-desc">Got questions about downloading YouTube Music? Here are common answers.</p>
       </div>
 
-      <div class="accordion" id="faq-accordion">
+      <div class="faq-accordion">
         <div class="accordion-item active">
           <button class="accordion-header">
-            <span>How does the YouTube Music downloader work?</span>
+            <span>Where can I host the backend for free?</span>
             <i class="fa-solid fa-chevron-down accordion-icon"></i>
           </button>
           <div class="accordion-content">
-            <p>Paste any YouTube or YouTube Music URL. The server uses <strong>yt-dlp</strong> to extract audio and convert it to high-quality MP3. Make sure yt-dlp and ffmpeg are installed on your server — see <code>How Run .txt</code> for setup.</p>
+            <p>You can deploy this repository directly to <strong>Render</strong> (free Docker web service), <strong>Railway</strong>, or <strong>Fly.io</strong>. The repository already contains <code>Dockerfile</code> and <code>render.yaml</code> ready for 1-click deployment!</p>
           </div>
         </div>
 
         <div class="accordion-item">
           <button class="accordion-header">
-            <span>Where are the downloaded music files saved on my device?</span>
+            <span>Can I test it locally on my computer?</span>
             <i class="fa-solid fa-chevron-down accordion-icon"></i>
           </button>
           <div class="accordion-content">
-            <p>By default, files are saved to your browser's default <strong>Downloads</strong> folder (e.g. Downloads on Mac/Windows or Files app on iOS/Android).</p>
+            <p>Yes! Simply run <code>npm start</code> in this folder. The backend will start on <code>http://localhost:3000</code> and the frontend will automatically connect to it.</p>
           </div>
         </div>
 
         <div class="accordion-item">
           <button class="accordion-header">
-            <span>Can I download full playlists in a ZIP file?</span>
+            <span>How do I connect my frontend on GitHub Pages to my Cloud Backend?</span>
             <i class="fa-solid fa-chevron-down accordion-icon"></i>
           </button>
           <div class="accordion-content">
-            <p>Yes! After you paste a playlist link, use the purple <strong>ZIP Download</strong> bar to save all tracks into one archive.</p>
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>What formats and quality levels are supported?</span>
-            <i class="fa-solid fa-chevron-down accordion-icon"></i>
-          </button>
-          <div class="accordion-content">
-            <p>We support MP3 at 320, 256, 192, 128, and 64 Kbps. The audio is extracted from the best available YouTube source and transcoded using ffmpeg.</p>
-          </div>
-        </div>
-
-        <div class="accordion-item">
-          <button class="accordion-header">
-            <span>Is it safe to use YTMusicMp3 downloader?</span>
-            <i class="fa-solid fa-chevron-down accordion-icon"></i>
-          </button>
-          <div class="accordion-content">
-            <p>Absolutely. The site is 100% cloud-based, free of malware or popups, and requires no desktop client or mobile APK installation.</p>
+            <p>Click the <strong>Backend API</strong> button in the navigation bar, paste your deployed backend URL (e.g. <code>https://your-app.onrender.com</code>), and click <strong>Save & Connect</strong>. It is saved in your browser's memory.</p>
           </div>
         </div>
       </div>
@@ -315,45 +257,95 @@
           <span class="brand-name">YTMusic<span class="highlight">Mp3</span></span>
         </div>
         <p class="footer-disclaimer">
-          Use only for music you have rights to download. © 2026 YTMusicMp3 — not affiliated with YouTube or Google LLC.
+          Use only for music you have rights to download. © 2026 YTMusicMp3 — Approach B Cloud Backend Architecture.
         </p>
       </div>
 
       <div class="footer-links">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Service</a>
-        <a href="#">DMCA Disclaimer</a>
-        <a href="#">Contact Support</a>
+        <a href="#how-it-works">How It Works</a>
+        <a href="#features">Features</a>
+        <a href="#faq">FAQ</a>
       </div>
     </div>
   </footer>
 
-  <!-- Cookies Modal -->
-  <div class="modal-overlay hidden" id="cookies-modal">
+  <!-- Backend Settings Modal -->
+  <div class="modal-overlay hidden" id="server-modal">
     <div class="modal-card">
       <div class="modal-header">
-        <h3><i class="fa-solid fa-cookie-bite"></i> YouTube Cloud Authentication</h3>
-        <button type="button" class="btn-close-modal" id="btn-close-cookies">&times;</button>
+        <h3><i class="fa-solid fa-server"></i> Backend API Configuration</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-server">&times;</button>
       </div>
       <div class="modal-body">
         <p class="modal-desc">
-          Cloud servers (Render / AWS) are frequently challenged by YouTube bot protection. Pasting your YouTube cookies allows the server to authenticate downloads as a real user.
+          Connect this frontend to your private backend server (Render, Railway, Fly.io, or localhost). This enables direct, high-quality 320 Kbps MP3 downloads without ads or third-party redirects.
         </p>
-        <div class="cookies-help-steps">
-          <h4>3 Quick Steps to Get Cookies:</h4>
+
+        <label class="option-label" style="flex-direction: column; align-items: flex-start; gap: 8px;">
+          <span><strong>Backend API URL:</strong></span>
+          <input type="url" id="backend-url-input" class="cookies-input" style="font-family: var(--font-body); font-size: 0.95rem; resize: none; height: auto; padding: 12px;" placeholder="https://your-backend.onrender.com or http://localhost:3000" value="">
+        </label>
+
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <button type="button" id="btn-test-backend" class="btn-download-sm btn-server-1" style="cursor: pointer;">
+            <i class="fa-solid fa-plug"></i> Test Connection
+          </button>
+          <span id="backend-test-result" style="font-size: 0.88rem; color: var(--text-muted);"></span>
+        </div>
+
+        <div class="cookies-help-steps" style="margin-top: 6px;">
+          <h4>Free Cloud Deployment (Render):</h4>
           <ol>
-            <li>Install the free extension: <a href="https://chromewebstore.google.com/detail/get-cookiestxt-locally/cclelndahbckbenkjhflpdbgdldlbecc" target="_blank" rel="noopener">Get cookies.txt LOCALLY</a></li>
-            <li>Open <a href="https://www.youtube.com" target="_blank" rel="noopener">YouTube.com</a> while signed into your account.</li>
-            <li>Click the extension icon, click <strong>Export</strong>, copy all the text, and paste it below:</li>
+            <li>Push this repository to your GitHub account.</li>
+            <li>Go to <a href="https://render.com" target="_blank" rel="noopener">Render.com</a> &rarr; <strong>New +</strong> &rarr; <strong>Web Service</strong>.</li>
+            <li>Connect your repo and choose <strong>Docker</strong> runtime (uses the included Dockerfile).</li>
+            <li>Click <strong>Deploy</strong> and copy your live URL into the box above!</li>
           </ol>
         </div>
-        <textarea id="cookies-textarea" class="cookies-input" rows="7" placeholder="# Netscape HTTP Cookie File&#10;.youtube.com TRUE / FALSE 1790000000 ..."></textarea>
+
+        <details style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: var(--radius-sm); padding: 10px 14px;">
+          <summary style="font-size: 0.88rem; color: #ffb703; cursor: pointer; font-weight: 600;">
+            <i class="fa-solid fa-cookie-bite"></i> YouTube Cookies (Optional for Cloud Bot Protection)
+          </summary>
+          <div style="margin-top: 10px;">
+            <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 8px;">If your cloud host ever gets challenged by YouTube bot protection, export your cookies with the "Get cookies.txt LOCALLY" browser extension and paste below:</p>
+            <textarea id="cookies-textarea" class="cookies-input" rows="4" placeholder="# Netscape HTTP Cookie File..."></textarea>
+            <button type="button" id="btn-save-cookies" class="btn-download-sm" style="margin-top: 6px; cursor: pointer;">Save Cookies</button>
+          </div>
+        </details>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn-modal-cancel" id="btn-cancel-cookies">Cancel</button>
-        <button type="button" class="btn-modal-save" id="btn-save-cookies">
-          <i class="fa-solid fa-check"></i> Save & Activate Cookies
+        <button type="button" class="btn-modal-cancel" id="btn-cancel-server">Cancel</button>
+        <button type="button" class="btn-modal-save" id="btn-save-server">
+          <i class="fa-solid fa-check"></i> Save & Connect
         </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Telegram Setup Modal -->
+  <div class="modal-overlay hidden" id="telegram-modal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-brands fa-telegram"></i> Telegram Mini App Setup</h3>
+        <button type="button" class="btn-close-modal" id="btn-close-telegram">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          How to run your YouTube Music Downloader inside Telegram with your Cloud Backend:
+        </p>
+        <div class="cookies-help-steps">
+          <h4>4 Steps:</h4>
+          <ol>
+            <li><strong>Deploy Backend:</strong> Deploy this repo to <a href="https://render.com" target="_blank" rel="noopener">Render</a> or Railway (free Docker web service).</li>
+            <li><strong>Host Frontend:</strong> Deploy frontend to GitHub Pages or directly use the URL provided by Render!</li>
+            <li><strong>Open @BotFather:</strong> In Telegram, chat with <strong>@BotFather</strong>, send <code>/newapp</code>, and paste your URL.</li>
+            <li><strong>Enjoy In-App Downloads:</strong> Open the Mini App in Telegram &rarr; paste any YouTube link &rarr; tap Download to get MP3s directly on your phone!</li>
+          </ol>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-cancel" id="btn-dismiss-telegram">Got it!</button>
       </div>
     </div>
   </div>
