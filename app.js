@@ -508,10 +508,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const backendBase = getBackendUrl();
     const directDownloadUrl = `${backendBase}/api/download?url=${encodeURIComponent(youtubeUrl)}&bitrate=${bitrate}`;
 
-    // Web Fallbacks
-    const server2Url = `https://ssyoutube.com/watch?v=${videoId}`;
-    const server3Url = `https://yt1s.com/en/youtube-to-mp3?q=${encodeURIComponent(youtubeUrl)}`;
-
     if (isPlaylist) {
       // Playlist Rendering
       const tracksHtml = (meta.tracks || []).map((t) => `
@@ -623,20 +619,11 @@ document.addEventListener('DOMContentLoaded', () => {
               <button type="button" class="btn-download-sm btn-server-1" id="btn-direct-download" data-url="${escapeHtml(youtubeUrl)}" data-title="${escapeHtml(meta.title)}" data-artist="${escapeHtml(meta.artist)}" title="Direct MP3 download from your cloud backend">
                 <i class="fa-solid fa-download"></i> <span>Download MP3 (Direct ${qualityLabel()}K)</span>
               </button>
-              <button type="button" class="btn-download-sm btn-server-2" data-action="link" data-url="${escapeHtml(server2Url)}" title="Alternative Server (SaveFrom)">
-                <i class="fa-solid fa-bolt"></i> <span>Server 2</span>
-              </button>
-              <button type="button" class="btn-download-sm btn-server-3" data-action="link" data-url="${escapeHtml(server3Url)}" title="Alternative Server (YT1s)">
-                <i class="fa-solid fa-cloud-arrow-down"></i> <span>Server 3</span>
-              </button>
               ${artworkUrl ? `
                 <button type="button" class="btn-download-sm btn-artwork" data-action="link" data-url="${escapeHtml(artworkUrl)}" title="View Artwork">
                   <i class="fa-solid fa-image"></i> Artwork
                 </button>
               ` : ''}
-              <button type="button" class="btn-download-sm btn-copy-link" data-url="${escapeHtml(youtubeUrl)}" title="Copy Link">
-                <i class="fa-regular fa-copy"></i> Copy Link
-              </button>
             </div>
           </div>
         </div>
@@ -685,22 +672,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const targetUrl = btn.getAttribute('data-url');
         if (targetUrl) {
           openExternalLink(targetUrl);
-          showToast('Opening download page...', 'info');
-        }
-      });
-    });
-
-    resultsContainer.querySelectorAll('.btn-copy-link').forEach((btn) => {
-      btn.addEventListener('click', async () => {
-        triggerHaptic('light');
-        const targetUrl = btn.getAttribute('data-url');
-        if (targetUrl) {
-          try {
-            await navigator.clipboard.writeText(targetUrl);
-            showToast('Link copied to clipboard!', 'success');
-          } catch (_) {
-            showToast(targetUrl, 'info');
-          }
+          showToast('Opening link...', 'info');
         }
       });
     });
