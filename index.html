@@ -60,11 +60,11 @@
     <div class="container hero-container">
       <div class="hero-badge">
         <img src="logo.png" alt="Tohea Logo" class="hero-badge-logo">
-        <span>Welcome to Tohea-YTD</span>
+        <span>Welcome to TOHEA-YTD</span>
       </div>
 
-      <h1 class="hero-title">Download YouTube Music <span class="gradient-text">For Producer</span></h1>
-      <p class="hero-subtitle">High-quality 320 Kbps MP3 sound.</p>
+      <h1 class="hero-title">Download YouTube Music <span class="gradient-text">Best For Producer</span></h1>
+      <p class="hero-subtitle">Download and listen a good quality of music.</p>
 
       <!-- Search & Download Card -->
       <div class="search-card-wrapper">
@@ -100,16 +100,90 @@
           </div>
 
           <div class="converter-options">
-            <label class="option-label" for="quality-select">
-              <i class="fa-solid fa-sliders"></i> Output quality
-              <select id="quality-select" class="quality-select" aria-label="Audio bitrate">
-                <option value="320" selected>320 Kbps MP3 (Best Audio)</option>
-                <option value="256">256 Kbps MP3</option>
-                <option value="192">192 Kbps</option>
-                <option value="128">128 Kbps</option>
-                <option value="64">64 Kbps</option>
-              </select>
-            </label>
+            <div class="option-label">
+              <i class="fa-solid fa-sliders"></i> Output quality:
+              
+              <!-- Liquid Glass Custom Dropdown -->
+              <div class="liquid-select-wrapper" id="quality-select-wrapper">
+                <!-- Synchronized native select for compatibility -->
+                <select id="quality-select" class="quality-select-native" aria-label="Audio bitrate" tabindex="-1">
+                  <option value="320" selected>320 Kbps MP3 (Best Audio)</option>
+                  <option value="256">256 Kbps MP3</option>
+                  <option value="192">192 Kbps</option>
+                  <option value="128">128 Kbps</option>
+                  <option value="64">64 Kbps</option>
+                </select>
+
+                <!-- Liquid Glass Trigger Capsule -->
+                <button type="button" class="liquid-select-trigger" id="quality-select-trigger" aria-haspopup="listbox" aria-expanded="false" aria-label="Select audio quality">
+                  <span class="trigger-label">
+                    <span class="quality-badge-pill">320K</span>
+                    <span class="trigger-text" id="quality-trigger-text">320 Kbps MP3 (Best Audio)</span>
+                  </span>
+                  <i class="fa-solid fa-chevron-down select-chevron" aria-hidden="true"></i>
+                </button>
+
+                <!-- Liquid Glass Floating Menu Popup -->
+                <div class="liquid-select-menu" id="quality-select-menu" role="listbox" aria-label="Audio bitrate options">
+                  <div class="liquid-menu-gloss"></div>
+                  
+                  <div class="liquid-option active" data-value="320" role="option" aria-selected="true" tabindex="0">
+                    <div class="option-content">
+                      <span class="option-pill studio">320K</span>
+                      <div class="option-text-group">
+                        <span class="option-title">320 Kbps MP3</span>
+                        <span class="option-subtitle">Studio Master • Best Audio</span>
+                      </div>
+                    </div>
+                    <i class="fa-solid fa-check option-check" aria-hidden="true"></i>
+                  </div>
+
+                  <div class="liquid-option" data-value="256" role="option" aria-selected="false" tabindex="0">
+                    <div class="option-content">
+                      <span class="option-pill">256K</span>
+                      <div class="option-text-group">
+                        <span class="option-title">256 Kbps MP3</span>
+                        <span class="option-subtitle">Very High Quality</span>
+                      </div>
+                    </div>
+                    <i class="fa-solid fa-check option-check" aria-hidden="true"></i>
+                  </div>
+
+                  <div class="liquid-option" data-value="192" role="option" aria-selected="false" tabindex="0">
+                    <div class="option-content">
+                      <span class="option-pill">192K</span>
+                      <div class="option-text-group">
+                        <span class="option-title">192 Kbps MP3</span>
+                        <span class="option-subtitle">Standard CD Quality</span>
+                      </div>
+                    </div>
+                    <i class="fa-solid fa-check option-check" aria-hidden="true"></i>
+                  </div>
+
+                  <div class="liquid-option" data-value="128" role="option" aria-selected="false" tabindex="0">
+                    <div class="option-content">
+                      <span class="option-pill">128K</span>
+                      <div class="option-text-group">
+                        <span class="option-title">128 Kbps MP3</span>
+                        <span class="option-subtitle">Lightweight / Fast</span>
+                      </div>
+                    </div>
+                    <i class="fa-solid fa-check option-check" aria-hidden="true"></i>
+                  </div>
+
+                  <div class="liquid-option" data-value="64" role="option" aria-selected="false" tabindex="0">
+                    <div class="option-content">
+                      <span class="option-pill">64K</span>
+                      <div class="option-text-group">
+                        <span class="option-title">64 Kbps MP3</span>
+                        <span class="option-subtitle">Voice / Low Bandwidth</span>
+                      </div>
+                    </div>
+                    <i class="fa-solid fa-check option-check" aria-hidden="true"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
 
             <!-- Quick Demo Button -->
             <div class="demo-triggers">
@@ -120,7 +194,7 @@
         </form>
 
         <div class="notice-bar">
-          <i class="fa-solid fa-shield-halved"></i> Direct MP3 Downloads • Zero Ads • No Sketchy Mirrors
+          <i class="fa-solid fa-compact-disc fa-spin notice-disc-icon"></i> High-quality 320 Kbps MP3 sound.
         </div>
       </div>
 
@@ -165,7 +239,7 @@
           <span class="brand-name">TOHEA-<span class="highlight">YTD</span></span>
         </div>
         <p class="footer-disclaimer">
-          Use only for music you have rights to download. © 2026 TOHEA-YTD.
+          Please download only music you have the legal rights to download.
         </p>
       </div>
 
@@ -259,36 +333,138 @@
   <!-- Custom JS -->
   <script src="app.js"></script>
 
-  <!-- Custom Cursor Trail Script -->
+  <!-- Custom Cursor Trail & Liquid Glass Interactive Scripts -->
   <script>
   (function() {
-    /* ---- Only run on devices with a fine pointer (no touch) ---- */
-    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    if ('ontouchstart' in window) return;
+    /* ═══════════════════════════════════════════════════════════════════
+       1. LIQUID GLASS DROPDOWN CONTROLLER
+       ═══════════════════════════════════════════════════════════════════ */
+    var selectWrapper = document.getElementById('quality-select-wrapper');
+    var selectTrigger = document.getElementById('quality-select-trigger');
+    var selectMenu    = document.getElementById('quality-select-menu');
+    var nativeSelect  = document.getElementById('quality-select');
+    var triggerText   = document.getElementById('quality-trigger-text');
+    var triggerBadge  = selectTrigger ? selectTrigger.querySelector('.quality-badge-pill') : null;
+    var options       = selectMenu ? selectMenu.querySelectorAll('.liquid-option') : [];
+
+    /* Lightweight Web Audio Synthesizer for tactile glass clicks */
+    var audioCtx = null;
+    function playGlassTick(freq, type, duration) {
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        var osc = audioCtx.createOscillator();
+        var gain = audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq || 880, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.04, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + (duration || 0.08));
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + (duration || 0.08));
+      } catch (_) {}
+    }
+
+    function toggleMenu(forceState) {
+      if (!selectWrapper) return;
+      var isOpen = selectWrapper.classList.contains('open');
+      var shouldOpen = typeof forceState === 'boolean' ? forceState : !isOpen;
+      
+      if (shouldOpen) {
+        selectWrapper.classList.add('open');
+        selectTrigger.setAttribute('aria-expanded', 'true');
+        playGlassTick(650, 'triangle', 0.06);
+      } else {
+        selectWrapper.classList.remove('open');
+        selectTrigger.setAttribute('aria-expanded', 'false');
+      }
+    }
+
+    if (selectTrigger) {
+      selectTrigger.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleMenu();
+      });
+    }
+
+    options.forEach(function(opt) {
+      opt.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var val = opt.getAttribute('data-value');
+        var optTitle = opt.querySelector('.option-title') ? opt.querySelector('.option-title').textContent : val + ' Kbps';
+        var optPill = opt.querySelector('.option-pill') ? opt.querySelector('.option-pill').textContent : val + 'K';
+
+        // Update active class
+        options.forEach(function(o) {
+          o.classList.remove('active');
+          o.setAttribute('aria-selected', 'false');
+        });
+        opt.classList.add('active');
+        opt.setAttribute('aria-selected', 'true');
+
+        // Update trigger text & badge
+        if (triggerText) triggerText.textContent = optTitle + (val === '320' ? ' (Best Audio)' : '');
+        if (triggerBadge) triggerBadge.textContent = optPill;
+
+        // Sync native select
+        if (nativeSelect) {
+          nativeSelect.value = val;
+          var evt = new Event('change', { bubbles: true });
+          nativeSelect.dispatchEvent(evt);
+        }
+
+        playGlassTick(1100, 'sine', 0.1);
+        toggleMenu(false);
+      });
+
+      // Keyboard support for options
+      opt.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          opt.click();
+        }
+      });
+    });
+
+    // Close on click outside
+    document.addEventListener('click', function(e) {
+      if (selectWrapper && !selectWrapper.contains(e.target)) {
+        toggleMenu(false);
+      }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && selectWrapper && selectWrapper.classList.contains('open')) {
+        toggleMenu(false);
+        if (selectTrigger) selectTrigger.focus();
+      }
+    });
+
+    /* ═══════════════════════════════════════════════════════════════════
+       2. MENSCH.CLUB LOGO CURSOR TRAIL WITH TANGENT ROTATION & PHYSICS
+       ═══════════════════════════════════════════════════════════════════ */
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches || 'ontouchstart' in window) return;
 
     var dot   = document.getElementById('cursor-dot');
     var TRAIL = 10;
     var trails = [];
     for (var i = 0; i < TRAIL; i++) trails.push(document.getElementById('trail-' + i));
 
-    /* positions: dot tracks the real pointer, trails ease toward the one ahead */
     var mx = -100, my = -100;
-    var pos = [{ x: -100, y: -100 }]; // dot
-    for (var j = 0; j < TRAIL; j++) pos.push({ x: -100, y: -100 });
+    var pos = [{ x: -100, y: -100, angle: 0, scale: 1 }];
+    for (var j = 0; j < TRAIL; j++) pos.push({ x: -100, y: -100, angle: 0, scale: 1 });
 
-    /* easing factors: each trail segment is progressively lazier */
     var EASE = [0.28, 0.25, 0.22, 0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07];
-    /* opacity for each trail segment */
-    var OPACITY = [0.6, 0.52, 0.44, 0.37, 0.30, 0.24, 0.18, 0.13, 0.08, 0.04];
+    var OPACITY = [0.92, 0.84, 0.76, 0.68, 0.60, 0.52, 0.44, 0.36, 0.28, 0.20];
 
-    /* Track mouse position */
     document.addEventListener('mousemove', function(e) {
       mx = e.clientX;
       my = e.clientY;
     });
 
-    /* Hover detection — enlarge on interactive elements */
-    var hovers = 'a, button, input, select, textarea, [role="button"], label, .icon-btn, .btn-submit, .demo-btn, .feature-box, .brand-logo, .nav-links a';
+    var hovers = 'a, button, input, select, textarea, [role="button"], label, .icon-btn, .btn-submit, .demo-btn, .feature-box, .brand-logo, .liquid-select-trigger, .liquid-option';
     document.addEventListener('mouseover', function(e) {
       if (e.target.closest && e.target.closest(hovers)) dot.classList.add('cursor-hover');
     });
@@ -296,11 +472,14 @@
       if (e.target.closest && e.target.closest(hovers)) dot.classList.remove('cursor-hover');
     });
 
-    /* Click shrink effect */
-    document.addEventListener('mousedown', function() { dot.classList.add('cursor-click'); });
-    document.addEventListener('mouseup', function() { dot.classList.remove('cursor-click'); });
+    document.addEventListener('mousedown', function() {
+      dot.classList.add('cursor-click');
+      playGlassTick(450, 'triangle', 0.04);
+    });
+    document.addEventListener('mouseup', function() {
+      dot.classList.remove('cursor-click');
+    });
 
-    /* Hide when pointer leaves the viewport */
     document.addEventListener('mouseleave', function() {
       dot.style.opacity = '0';
       for (var k = 0; k < TRAIL; k++) trails[k].style.opacity = '0';
@@ -309,27 +488,37 @@
       dot.style.opacity = '1';
     });
 
-    /* Animation loop */
     function tick() {
-      /* Dot follows pointer instantly */
       pos[0].x = mx;
       pos[0].y = my;
       dot.style.transform = 'translate(' + pos[0].x + 'px,' + pos[0].y + 'px) translate(-50%,-50%)';
 
-      /* Each trail segment eases toward the one in front */
       for (var i = 0; i < TRAIL; i++) {
         var prev = pos[i];
         var cur  = pos[i + 1];
-        cur.x += (prev.x - cur.x) * EASE[i];
-        cur.y += (prev.y - cur.y) * EASE[i];
+        
+        var vx = (prev.x - cur.x);
+        var vy = (prev.y - cur.y);
+        cur.x += vx * EASE[i];
+        cur.y += vy * EASE[i];
 
-        /* Only show the trail when there's actual distance (motion) */
-        var dx = prev.x - cur.x;
-        var dy = prev.y - cur.y;
-        var dist = Math.sqrt(dx * dx + dy * dy);
-        var op = dist > 1 ? OPACITY[i] : 0;
+        var dist = Math.sqrt(vx * vx + vy * vy);
+        
+        // Calculate tangent rotation angle (mensch.club physics)
+        if (dist > 1.2) {
+          var targetAngle = Math.atan2(vy, vx) * (180 / Math.PI) - 45;
+          // Smooth angle interpolation
+          var diffAngle = targetAngle - cur.angle;
+          while (diffAngle < -180) diffAngle += 360;
+          while (diffAngle > 180)  diffAngle -= 360;
+          cur.angle += diffAngle * 0.22;
+          cur.scale = Math.min(1 + dist * 0.012, 1.35);
+        } else {
+          cur.scale += (1 - cur.scale) * 0.15;
+        }
 
-        trails[i].style.transform = 'translate(' + cur.x + 'px,' + cur.y + 'px) translate(-50%,-50%)';
+        var op = dist > 0.8 ? OPACITY[i] : 0;
+        trails[i].style.transform = 'translate(' + cur.x + 'px,' + cur.y + 'px) translate(-50%,-50%) rotate(' + cur.angle + 'deg) scale(' + cur.scale + ')';
         trails[i].style.opacity = op;
       }
 
