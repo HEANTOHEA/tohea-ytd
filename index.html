@@ -453,8 +453,8 @@
     for (var i = 0; i < TRAIL; i++) trails.push(document.getElementById('trail-' + i));
 
     var mx = -100, my = -100;
-    var pos = [{ x: -100, y: -100, angle: 0, scale: 1 }];
-    for (var j = 0; j < TRAIL; j++) pos.push({ x: -100, y: -100, angle: 0, scale: 1 });
+    var pos = [{ x: -100, y: -100 }];
+    for (var j = 0; j < TRAIL; j++) pos.push({ x: -100, y: -100 });
 
     var EASE = [0.28, 0.25, 0.22, 0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07];
     var OPACITY = [0.92, 0.84, 0.76, 0.68, 0.60, 0.52, 0.44, 0.36, 0.28, 0.20];
@@ -503,22 +503,10 @@
         cur.y += vy * EASE[i];
 
         var dist = Math.sqrt(vx * vx + vy * vy);
-        
-        // Calculate tangent rotation angle (mensch.club physics)
-        if (dist > 1.2) {
-          var targetAngle = Math.atan2(vy, vx) * (180 / Math.PI) - 45;
-          // Smooth angle interpolation
-          var diffAngle = targetAngle - cur.angle;
-          while (diffAngle < -180) diffAngle += 360;
-          while (diffAngle > 180)  diffAngle -= 360;
-          cur.angle += diffAngle * 0.22;
-          cur.scale = Math.min(1 + dist * 0.012, 1.35);
-        } else {
-          cur.scale += (1 - cur.scale) * 0.15;
-        }
-
         var op = dist > 0.8 ? OPACITY[i] : 0;
-        trails[i].style.transform = 'translate(' + cur.x + 'px,' + cur.y + 'px) translate(-50%,-50%) rotate(' + cur.angle + 'deg) scale(' + cur.scale + ')';
+
+        // No rotation: shapes behind stay perfectly upright
+        trails[i].style.transform = 'translate(' + cur.x + 'px,' + cur.y + 'px) translate(-50%,-50%)';
         trails[i].style.opacity = op;
       }
 
