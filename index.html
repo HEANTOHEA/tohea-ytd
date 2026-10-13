@@ -27,6 +27,19 @@
 </head>
 <body>
 
+  <!-- Custom Logo Cursor Trail -->
+  <div class="cursor-dot" id="cursor-dot"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-0" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-1" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-2" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-3" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-4" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-5" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-6" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-7" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-8" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+  <div class="cursor-trail" id="trail-9" style="width:22px;height:22px;"><img src="logo.png" alt="" aria-hidden="true"></div>
+
   <!-- Navigation Header -->
   <header class="site-header">
     <div class="container header-container">
@@ -149,10 +162,10 @@
       <div class="footer-brand">
         <div class="brand-logo">
           <img src="logo.png" alt="TOHEA-YTD Logo" class="brand-logo-img">
-          <span class="brand-name">Tohea-<span class="highlight">YTD</span></span>
+          <span class="brand-name">TOHEA-<span class="highlight">YTD</span></span>
         </div>
         <p class="footer-disclaimer">
-          Use only for music you have rights to download. © 2026 Tohea-YTD.
+          Use only for music you have rights to download. © 2026 TOHEA-YTD.
         </p>
       </div>
 
@@ -245,5 +258,85 @@
 
   <!-- Custom JS -->
   <script src="app.js"></script>
+
+  <!-- Custom Cursor Trail Script -->
+  <script>
+  (function() {
+    /* ---- Only run on devices with a fine pointer (no touch) ---- */
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    if ('ontouchstart' in window) return;
+
+    var dot   = document.getElementById('cursor-dot');
+    var TRAIL = 10;
+    var trails = [];
+    for (var i = 0; i < TRAIL; i++) trails.push(document.getElementById('trail-' + i));
+
+    /* positions: dot tracks the real pointer, trails ease toward the one ahead */
+    var mx = -100, my = -100;
+    var pos = [{ x: -100, y: -100 }]; // dot
+    for (var j = 0; j < TRAIL; j++) pos.push({ x: -100, y: -100 });
+
+    /* easing factors: each trail segment is progressively lazier */
+    var EASE = [0.28, 0.25, 0.22, 0.19, 0.17, 0.15, 0.13, 0.11, 0.09, 0.07];
+    /* opacity for each trail segment */
+    var OPACITY = [0.6, 0.52, 0.44, 0.37, 0.30, 0.24, 0.18, 0.13, 0.08, 0.04];
+
+    /* Track mouse position */
+    document.addEventListener('mousemove', function(e) {
+      mx = e.clientX;
+      my = e.clientY;
+    });
+
+    /* Hover detection — enlarge on interactive elements */
+    var hovers = 'a, button, input, select, textarea, [role="button"], label, .icon-btn, .btn-submit, .demo-btn, .feature-box, .brand-logo, .nav-links a';
+    document.addEventListener('mouseover', function(e) {
+      if (e.target.closest && e.target.closest(hovers)) dot.classList.add('cursor-hover');
+    });
+    document.addEventListener('mouseout', function(e) {
+      if (e.target.closest && e.target.closest(hovers)) dot.classList.remove('cursor-hover');
+    });
+
+    /* Click shrink effect */
+    document.addEventListener('mousedown', function() { dot.classList.add('cursor-click'); });
+    document.addEventListener('mouseup', function() { dot.classList.remove('cursor-click'); });
+
+    /* Hide when pointer leaves the viewport */
+    document.addEventListener('mouseleave', function() {
+      dot.style.opacity = '0';
+      for (var k = 0; k < TRAIL; k++) trails[k].style.opacity = '0';
+    });
+    document.addEventListener('mouseenter', function() {
+      dot.style.opacity = '1';
+    });
+
+    /* Animation loop */
+    function tick() {
+      /* Dot follows pointer instantly */
+      pos[0].x = mx;
+      pos[0].y = my;
+      dot.style.transform = 'translate(' + pos[0].x + 'px,' + pos[0].y + 'px) translate(-50%,-50%)';
+
+      /* Each trail segment eases toward the one in front */
+      for (var i = 0; i < TRAIL; i++) {
+        var prev = pos[i];
+        var cur  = pos[i + 1];
+        cur.x += (prev.x - cur.x) * EASE[i];
+        cur.y += (prev.y - cur.y) * EASE[i];
+
+        /* Only show the trail when there's actual distance (motion) */
+        var dx = prev.x - cur.x;
+        var dy = prev.y - cur.y;
+        var dist = Math.sqrt(dx * dx + dy * dy);
+        var op = dist > 1 ? OPACITY[i] : 0;
+
+        trails[i].style.transform = 'translate(' + cur.x + 'px,' + cur.y + 'px) translate(-50%,-50%)';
+        trails[i].style.opacity = op;
+      }
+
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+  </script>
 </body>
 </html>
