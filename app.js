@@ -730,10 +730,15 @@ document.addEventListener('DOMContentLoaded', () => {
       showToast(`Saved: ${filename}`, 'success');
     } catch (err) {
       triggerHaptic('error');
-      showToast(err.message || 'Backend download failed.', 'error');
+      const isFetchErr = err.name === 'TypeError' || (err.message && err.message.toLowerCase().includes('fetch'));
+      if (isFetchErr) {
+        showToast('Backend offline. Run "npm start" and visit http://localhost:3000 in your browser.', 'error');
+      } else {
+        showToast(err.message || 'Backend download failed.', 'error');
+      }
 
       // If backend is unreachable, offer to configure
-      if (!isBackendOnline) {
+      if (!isBackendOnline && typeof openServerModal === 'function') {
         setTimeout(() => openServerModal(), 1200);
       }
     } finally {
