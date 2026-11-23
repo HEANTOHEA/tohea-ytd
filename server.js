@@ -246,9 +246,8 @@ function getYtdlpBaseArgs() {
   const base = [
     '--no-warnings',
     '--no-check-certificates',
+    '--extractor-args', 'youtube:player_client=android,ios,web',
     '--js-runtimes', 'node',
-    '--user-agent',
-    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
   ];
   const ffmpegPath = getFfmpegPath();
   if (ffmpegPath) {
@@ -439,7 +438,7 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
 
     const argsVariants = [
       [
-        '-f', 'bestaudio[ext=m4a]/bestaudio[ext=webm]/bestaudio/best',
+        '-f', 'ba/ba*/bestaudio[ext=m4a]/bestaudio/b/best',
         '-x',
         '--audio-format', 'mp3',
         '--audio-quality', `${bitrate}K`,
@@ -459,7 +458,7 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
         targetUrl,
       ],
       [
-        '-f', 'ba/ba*/b/best',
+        '-f', 'b/ba/best',
         '-x',
         '--audio-format', 'mp3',
         '--audio-quality', `${bitrate}K`,
