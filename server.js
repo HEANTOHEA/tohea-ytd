@@ -151,6 +151,14 @@ async function initTools() {
     }
   }
 
+  // Attempt self-update if yt-dlp is available (keeps extractor logic updated)
+  if (HAS_YTDLP) {
+    try {
+      const exec = getYtdlpExecutable();
+      execSync(`"${exec}" -U`, { stdio: 'pipe', timeout: 20000 });
+    } catch (_) {}
+  }
+
   try {
     HAS_FFMPEG = isFfmpegAvailable();
   } catch (_) {}
@@ -275,8 +283,12 @@ function ytdlpGetJson(url, extraArgs = []) {
 
     execFile(ytdlpBin, args, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (err, stdout, stderr) => {
       if (err) {
+        // If binary executed and failed with a runtime error, don't mask it with fallback ENOENTs
+        if (err.code !== 'ENOENT') {
+          return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
+        }
+
         const tryFallback = () => {
-          // Fallback to python3 -m yt_dlp
           return execFile(
             'python3',
             ['-m', 'yt_dlp', ...args],
@@ -285,18 +297,7 @@ function ytdlpGetJson(url, extraArgs = []) {
               if (!py3Err) {
                 return parseLines(py3Stdout);
               }
-              // Fallback to python -m yt_dlp
-              return execFile(
-                'python',
-                ['-m', 'yt_dlp', ...args],
-                { maxBuffer: 50 * 1024 * 1024, timeout: 120000 },
-                (pyErr, pyStdout) => {
-                  if (!pyErr) {
-                    return parseLines(pyStdout);
-                  }
-                  return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
-                }
-              );
+              return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
             }
           );
         };
@@ -483,12 +484,17 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
             return execute(cmd, argsVariants[currentVariantIndex + 1]);
           }
 
+          // If the executable actually ran and failed (not an ENOENT / not-found error),
+          // do NOT mask the error by falling back to non-existent commands!
+          if (err.code !== 'ENOENT') {
+            return reject(new Error(stderr || err.message || 'yt-dlp download failed'));
+          }
+
+          // Only attempt fallback binaries if current binary was not found (ENOENT)
           if (cmd === ytdlpBin && cmd !== 'yt-dlp') {
             return execute('yt-dlp', cmdArgs);
-          } else if (cmd === 'yt-dlp' || cmd === ytdlpBin) {
+          } else if (cmd === 'yt-dlp') {
             return execute('python3', ['-m', 'yt_dlp', ...cmdArgs]);
-          } else if (cmd === 'python3') {
-            return execute('python', ['-m', 'yt_dlp', ...cmdArgs]);
           }
           return reject(new Error(stderr || err.message || 'yt-dlp download failed'));
         }
@@ -532,9 +538,11 @@ function formatYtdlpError(rawErr) {
     msg.includes('Sign in to confirm you') ||
     msg.includes('Failed to extract any player response') ||
     msg.includes('confirm you’re not a bot') ||
-    msg.includes('bot detection')
+    msg.includes('bot detection') ||
+    msg.includes('Sign in to confirm your age') ||
+    msg.includes('HTTP Error 429')
   ) {
-    return 'YouTube requires authentication on cloud servers. Click "YouTube Cookies" in the top bar to paste your cookies and unlock downloads.';
+    return 'YouTube requires verification on cloud servers (bot protection). Set YT_COOKIES_CONTENT in Render environment variables or run the app locally.';
   }
   return msg || 'Download failed.';
 }
