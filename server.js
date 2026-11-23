@@ -96,19 +96,19 @@ function getYtdlpExecutable() {
 function isYtdlpAvailable() {
   const exec = getYtdlpExecutable();
   try {
-    execSync(`"${exec}" --version`, { stdio: 'pipe' });
+    execSync(`"${exec}" --version`, { stdio: 'pipe', timeout: 15000 });
     return true;
   } catch (_) {
     try {
-      execSync('yt-dlp --version', { stdio: 'pipe' });
+      execSync('yt-dlp --version', { stdio: 'pipe', timeout: 15000 });
       return true;
     } catch (_) {
       try {
-        execSync('python3 -m yt_dlp --version', { stdio: 'pipe' });
+        execSync('python3 -m yt_dlp --version', { stdio: 'pipe', timeout: 15000 });
         return true;
       } catch (_) {
         try {
-          execSync('python -m yt_dlp --version', { stdio: 'pipe' });
+          execSync('python -m yt_dlp --version', { stdio: 'pipe', timeout: 15000 });
           return true;
         } catch (_) {
           return false;
@@ -121,28 +121,43 @@ function isYtdlpAvailable() {
 function isFfmpegAvailable() {
   if (getFfmpegPath()) return true;
   try {
-    execSync('ffmpeg -version', { stdio: 'pipe' });
+    execSync('ffmpeg -version', { stdio: 'pipe', timeout: 15000 });
     return true;
   } catch (_) {
     return false;
   }
 }
 
-// Automatically install yt-dlp on launch if missing
-if (!isYtdlpAvailable()) {
-  try {
-    console.log('[server] yt-dlp not detected. Attempting automated installation via scripts/install-ytdlp.js...');
-    const installScript = path.join(__dirname, 'scripts', 'install-ytdlp.js');
-    if (fs.existsSync(installScript)) {
-      execSync(`node "${installScript}"`, { stdio: 'inherit' });
-    }
-  } catch (err) {
-    console.warn('[server] Auto-install yt-dlp warning:', err.message);
-  }
-}
+// Tool availability — resolved asynchronously AFTER server starts to avoid SIGTERM on Render
+let HAS_YTDLP = false;
+let HAS_FFMPEG = false;
 
-const HAS_YTDLP = isYtdlpAvailable();
-const HAS_FFMPEG = isFfmpegAvailable();
+async function initTools() {
+  try {
+    HAS_YTDLP = isYtdlpAvailable();
+  } catch (_) {}
+
+  // Auto-install yt-dlp if missing
+  if (!HAS_YTDLP) {
+    try {
+      console.log('[server] yt-dlp not detected. Attempting automated installation via scripts/install-ytdlp.js...');
+      const installScript = path.join(__dirname, 'scripts', 'install-ytdlp.js');
+      if (fs.existsSync(installScript)) {
+        execSync(`node "${installScript}"`, { stdio: 'inherit', timeout: 60000 });
+      }
+      HAS_YTDLP = isYtdlpAvailable();
+    } catch (err) {
+      console.warn('[server] Auto-install yt-dlp warning:', err.message);
+    }
+  }
+
+  try {
+    HAS_FFMPEG = isFfmpegAvailable();
+  } catch (_) {}
+
+  console.log(HAS_YTDLP ? '✓ yt-dlp detected' : '✗ yt-dlp NOT found — install it for downloads');
+  console.log(HAS_FFMPEG ? '✓ ffmpeg detected' : '✗ ffmpeg NOT found — install it for MP3 conversion');
+}
 
 function getTmpDir() {
   const dir = path.join(os.tmpdir(), 'ytmusic-dl');
@@ -660,8 +675,8 @@ app.post('/api/download-zip', async (req, res) => {
 
 app.listen(PORT, HOST, () => {
   console.log(`YouTube Music Downloader running at http://${HOST === '0.0.0.0' ? 'localhost' : HOST}:${PORT}`);
-  console.log(HAS_YTDLP ? '✓ yt-dlp detected' : '✗ yt-dlp NOT found — install it for downloads');
-  console.log(HAS_FFMPEG ? '✓ ffmpeg detected' : '✗ ffmpeg NOT found — install it for MP3 conversion');
+  // Initialize tools AFTER server is listening so health checks pass immediately
+  initTools().catch((err) => console.error('[server] Tool init error:', err.message));
 }).on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(
