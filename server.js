@@ -325,6 +325,7 @@ function getYtdlpBaseArgs() {
   const base = [
     '--no-warnings',
     '--no-check-certificates',
+    '--extractor-args', 'youtube:player_client=tv_embedded',
     '--js-runtimes', 'node',
   ];
   const ffmpegPath = getFfmpegPath();
