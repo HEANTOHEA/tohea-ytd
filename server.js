@@ -325,7 +325,6 @@ function getYtdlpBaseArgs() {
   const base = [
     '--no-warnings',
     '--no-check-certificates',
-    '--extractor-args', 'youtube:player_client=android,ios,web',
     '--js-runtimes', 'node',
   ];
   const ffmpegPath = getFfmpegPath();
@@ -362,10 +361,14 @@ function ytdlpGetJson(url, extraArgs = []) {
     function runJson(cmdArgs) {
       execFile(ytdlpBin, cmdArgs, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (err, stdout, stderr) => {
         if (err) {
-          // If metadata fetch failed with cookies (e.g. cookies expired), retry cleanly without cookies
+          // If metadata fetch failed with cookies, only retry without cookies if cookies are explicitly invalid
           if (cmdArgs.includes('--cookies')) {
-            console.warn('[server] Metadata fetch with cookies failed, retrying without cookies...');
-            return runJson(stripCookiesFromArgs(cmdArgs));
+            const errStr = (stderr || err.message || '');
+            console.warn('[server] Metadata fetch with cookies error:', errStr);
+            if (errStr.includes('cookies are no longer valid') || errStr.includes('cookie format')) {
+              console.warn('[server] Invalid cookies detected, retrying without cookies...');
+              return runJson(stripCookiesFromArgs(cmdArgs));
+            }
           }
 
           // If binary executed and failed with a runtime error, don't mask it with fallback ENOENTs
@@ -572,11 +575,15 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
             return execute(cmd, argsVariants[currentVariantIndex + 1]);
           }
 
-          // If download failed with cookies (e.g. expired / rotated cookies), retry cleanly without cookies!
+          // If download failed with cookies, only retry without cookies if cookies are explicitly invalid
           if (cmdArgs.includes('--cookies')) {
-            console.warn('[server] Download with cookies failed, retrying without cookies...');
-            const noCookieArgs = stripCookiesFromArgs(cmdArgs);
-            return execute(cmd, noCookieArgs);
+            const errStr = (stderr || err.message || '');
+            console.warn('[server] Download with cookies error:', errStr);
+            if (errStr.includes('cookies are no longer valid') || errStr.includes('cookie format')) {
+              console.warn('[server] Invalid cookies detected, retrying without cookies...');
+              const noCookieArgs = stripCookiesFromArgs(cmdArgs);
+              return execute(cmd, noCookieArgs);
+            }
           }
 
           // If the executable actually ran and failed (not an ENOENT / not-found error),

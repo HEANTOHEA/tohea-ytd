@@ -592,7 +592,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <p class="media-artist">${escapeHtml(meta.artist)}</p>
             <div class="media-meta">
               <span><i class="fa-solid fa-headphones"></i> MP3 (${qualityLabel()} Kbps)</span>
-              <span><i class="fa-brands fa-telegram"></i> Telegram Mini App Ready</span>
+              
             </div>
 
             ${videoId ? `
