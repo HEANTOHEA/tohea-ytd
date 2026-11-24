@@ -19,13 +19,92 @@ if (fs.existsSync('.env')) {
   } catch (_) {}
 }
 
-// Support cookies passed via environment variable (useful on cloud hosts like Render/Railway)
-if (process.env.YT_COOKIES_CONTENT) {
-  try {
-    const cookiesFile = path.join(os.tmpdir(), 'yt-cookies.txt');
-    fs.writeFileSync(cookiesFile, process.env.YT_COOKIES_CONTENT, 'utf8');
-    process.env.YT_COOKIES_PATH = cookiesFile;
-  } catch (_) {}
+function formatNetscapeCookies(rawText) {
+  if (!rawText) return '';
+  let text = String(rawText).trim();
+  if (text.includes('\\n') && !text.includes('\n')) {
+    text = text.replace(/\\n/g, '\n');
+  }
+  if (text.includes('\\t')) {
+    text = text.replace(/\\t/g, '\t');
+  }
+
+  const lines = text.split(/\r?\n/);
+  const resultLines = [
+    '# Netscape HTTP Cookie File',
+    '# https://curl.haxx.se/rfc/cookie_spec.html',
+    '# This is a generated file! Do not edit.',
+  ];
+
+  for (let line of lines) {
+    line = line.trim();
+    if (!line || line.startsWith('#')) continue;
+
+    // Check if space or tab separated
+    const tabParts = line.split('\t');
+    if (tabParts.length >= 7) {
+      resultLines.push(tabParts.join('\t'));
+      continue;
+    }
+
+    const spaceParts = line.split(/\s+/);
+    if (spaceParts.length >= 7) {
+      const domain = spaceParts[0];
+      const flag = spaceParts[1];
+      const path = spaceParts[2];
+      const secure = spaceParts[3];
+      const expires = spaceParts[4];
+      const name = spaceParts[5];
+      const value = spaceParts.slice(6).join(' ');
+      resultLines.push([domain, flag, path, secure, expires, name, value].join('\t'));
+    }
+  }
+
+  return resultLines.join('\n') + '\n';
+}
+
+function initCookies() {
+  if (process.env.YT_COOKIES_CONTENT) {
+    try {
+      const cookiesFile = path.join(os.tmpdir(), 'yt-cookies.txt');
+      const formatted = formatNetscapeCookies(process.env.YT_COOKIES_CONTENT);
+      fs.writeFileSync(cookiesFile, formatted, 'utf8');
+      process.env.YT_COOKIES_PATH = cookiesFile;
+      console.log(`[server] Formatted & saved YT_COOKIES_CONTENT (${formatted.split('\n').length} lines)`);
+    } catch (e) {
+      console.warn('[server] Error saving YT_COOKIES_CONTENT:', e.message);
+    }
+  }
+
+  if (!process.env.YT_COOKIES_PATH || !fs.existsSync(process.env.YT_COOKIES_PATH)) {
+    const candidates = [
+      '/etc/secrets/cookies.txt',
+      '/etc/secrets/yt-cookies.txt',
+      path.join(__dirname, 'cookies.txt'),
+      path.join(os.tmpdir(), 'yt-cookies.txt'),
+    ];
+    for (const c of candidates) {
+      if (fs.existsSync(c)) {
+        process.env.YT_COOKIES_PATH = c;
+        console.log(`[server] Detected cookies file at: ${c}`);
+        break;
+      }
+    }
+  }
+}
+
+initCookies();
+
+function stripCookiesFromArgs(cmdArgs) {
+  const clean = [];
+  for (let i = 0; i < cmdArgs.length; i++) {
+    if (cmdArgs[i] === '--cookies') {
+      i++; // skip cookie path
+      continue;
+    }
+    clean.push(cmdArgs[i]);
+  }
+  return clean;
 }
 
 const PORT = process.env.PORT || 3000;
@@ -280,38 +359,48 @@ function ytdlpGetJson(url, extraArgs = []) {
 
     const ytdlpBin = getYtdlpExecutable();
 
-    execFile(ytdlpBin, args, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (err, stdout, stderr) => {
-      if (err) {
-        // If binary executed and failed with a runtime error, don't mask it with fallback ENOENTs
-        if (err.code !== 'ENOENT') {
-          return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
-        }
+    function runJson(cmdArgs) {
+      execFile(ytdlpBin, cmdArgs, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (err, stdout, stderr) => {
+        if (err) {
+          // If metadata fetch failed with cookies (e.g. cookies expired), retry cleanly without cookies
+          if (cmdArgs.includes('--cookies')) {
+            console.warn('[server] Metadata fetch with cookies failed, retrying without cookies...');
+            return runJson(stripCookiesFromArgs(cmdArgs));
+          }
 
-        const tryFallback = () => {
-          return execFile(
-            'python3',
-            ['-m', 'yt_dlp', ...args],
-            { maxBuffer: 50 * 1024 * 1024, timeout: 120000 },
-            (py3Err, py3Stdout) => {
-              if (!py3Err) {
-                return parseLines(py3Stdout);
+          // If binary executed and failed with a runtime error, don't mask it with fallback ENOENTs
+          if (err.code !== 'ENOENT') {
+            return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
+          }
+
+          const tryFallback = () => {
+            return execFile(
+              'python3',
+              ['-m', 'yt_dlp', ...cmdArgs],
+              { maxBuffer: 50 * 1024 * 1024, timeout: 120000 },
+              (py3Err, py3Stdout) => {
+                if (!py3Err) {
+                  return parseLines(py3Stdout);
+                }
+                return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
               }
-              return reject(new Error(stderr || err.message || 'yt-dlp failed to retrieve video info'));
-            }
-          );
-        };
+            );
+          };
 
-        if (ytdlpBin !== 'yt-dlp') {
-          return execFile('yt-dlp', args, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (e2, s2) => {
-            if (!e2) return parseLines(s2);
-            tryFallback();
-          });
+          if (ytdlpBin !== 'yt-dlp') {
+            return execFile('yt-dlp', cmdArgs, { maxBuffer: 50 * 1024 * 1024, timeout: 120000 }, (e2, s2) => {
+              if (!e2) return parseLines(s2);
+              tryFallback();
+            });
+          }
+
+          return tryFallback();
         }
+        parseLines(stdout);
+      });
+    }
 
-        return tryFallback();
-      }
-      parseLines(stdout);
-    });
+    runJson(args);
 
     function parseLines(raw) {
       try {
@@ -483,6 +572,13 @@ function ytdlpDownload(videoUrl, bitrate = '320') {
             return execute(cmd, argsVariants[currentVariantIndex + 1]);
           }
 
+          // If download failed with cookies (e.g. expired / rotated cookies), retry cleanly without cookies!
+          if (cmdArgs.includes('--cookies')) {
+            console.warn('[server] Download with cookies failed, retrying without cookies...');
+            const noCookieArgs = stripCookiesFromArgs(cmdArgs);
+            return execute(cmd, noCookieArgs);
+          }
+
           // If the executable actually ran and failed (not an ENOENT / not-found error),
           // do NOT mask the error by falling back to non-existent commands!
           if (err.code !== 'ENOENT') {
@@ -574,11 +670,13 @@ app.post('/api/cookies', (req, res) => {
     if (!raw) {
       return res.status(400).json({ error: 'Cookies text cannot be empty.' });
     }
+    const formatted = formatNetscapeCookies(raw);
     const cookiesFile = path.join(__dirname, 'cookies.txt');
-    fs.writeFileSync(cookiesFile, raw, 'utf8');
+    fs.writeFileSync(cookiesFile, formatted, 'utf8');
     process.env.YT_COOKIES_PATH = cookiesFile;
-    res.json({ ok: true, message: 'YouTube cookies saved successfully!' });
+    res.json({ ok: true, message: 'YouTube cookies saved and formatted successfully!' });
   } catch (err) {
+    console.error('[server:cookies:error]', err);
     res.status(500).json({ error: 'Failed saving cookies: ' + err.message });
   }
 });
@@ -594,6 +692,7 @@ app.post('/api/analyze', async (req, res) => {
     const metadata = await resolveMetadata(rawUrl);
     res.json({ ok: true, metadata });
   } catch (err) {
+    console.error('[server:analyze:error]', err.message);
     res.status(400).json({ error: formatYtdlpError(err.message) });
   }
 });
@@ -626,6 +725,7 @@ app.get('/api/download', async (req, res) => {
     res.setHeader('X-Download-Source', 'full');
     res.send(file.buffer);
   } catch (err) {
+    console.error('[server:download:error]', err.message);
     res.status(400).json({ error: formatYtdlpError(err.message) });
   }
 });
