@@ -123,6 +123,81 @@ app.use(
 app.use(express.json({ limit: '2mb' }));
 app.use(express.static(__dirname));
 
+// Reverse Proxy: Forward /api requests to local residential worker if configured
+if (process.env.LOCAL_TUNNEL_URL) {
+  const tunnelBase = process.env.LOCAL_TUNNEL_URL.trim().replace(/\/$/, '');
+  console.log(`[server] Hybrid mode enabled. Forwarding /api to local tunnel: ${tunnelBase}`);
+
+  app.use('/api', async (req, res, next) => {
+    // Keep health check responding from Render directly with tunnel status
+    if (req.path === '/health') {
+      return res.json({
+        ok: true,
+        mode: 'hybrid_tunnel_proxy',
+        tunnel: tunnelBase,
+      });
+    }
+
+    try {
+      const targetUrl = `${tunnelBase}${req.originalUrl}`;
+      const headers = {};
+      for (const [key, val] of Object.entries(req.headers)) {
+        if (!['host', 'content-length'].includes(key.toLowerCase())) {
+          headers[key] = val;
+        }
+      }
+      if (process.env.ORIGIN_TOKEN) {
+        headers['x-origin-token'] = process.env.ORIGIN_TOKEN;
+      }
+
+      const isBodyMethod = !['GET', 'HEAD'].includes(req.method.toUpperCase());
+      const fetchOptions = {
+        method: req.method,
+        headers,
+      };
+      if (isBodyMethod && req.body) {
+        fetchOptions.headers['content-type'] = 'application/json';
+        fetchOptions.body = JSON.stringify(req.body);
+      }
+
+      const proxyRes = await fetch(targetUrl, fetchOptions);
+
+      res.status(proxyRes.status);
+      proxyRes.headers.forEach((v, k) => {
+        const lower = k.toLowerCase();
+        if (!['content-encoding', 'transfer-encoding', 'connection'].includes(lower)) {
+          res.setHeader(k, v);
+        }
+      });
+
+      // Stream the response body directly (handles large MP3 downloads efficiently)
+      const { Readable } = require('stream');
+      if (proxyRes.body) {
+        Readable.fromWeb(proxyRes.body).pipe(res);
+      } else {
+        res.end();
+      }
+    } catch (err) {
+      console.error('[server:tunnel:error]', err.message);
+      res.status(502).json({
+        error: `Local downloader tunnel is unreachable (${err.message}). Ensure your local PC and cloudflared are running!`,
+      });
+    }
+  });
+}
+
+// Security: Validate X-Origin-Token if configured (rejects direct tunnel bypass)
+if (process.env.ORIGIN_TOKEN) {
+  app.use('/api', (req, res, next) => {
+    // Health check can remain open or require token as needed
+    if (req.path === '/health') return next();
+    if (req.get('X-Origin-Token') !== process.env.ORIGIN_TOKEN) {
+      return res.status(403).json({ error: 'Access forbidden: Invalid origin token.' });
+    }
+    next();
+  });
+}
+
 function getFfmpegPath() {
   try {
     const ffmpegStatic = require('ffmpeg-static');
